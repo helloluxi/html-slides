@@ -840,7 +840,7 @@
   const urlParams = new URLSearchParams(window.location.search);
   const slideParam = urlParams.get('p');
   if (slideParam) {
-    const parsedSlide = parseInt(slideParam, 10) || 0;
+    const parsedSlide = parseInt(slideParam) || 0;
     currentSlide = Math.max(0, Math.min(parsedSlide, slides.length - 1));
   }
   updateSlide();
@@ -886,6 +886,7 @@
   let touchStartY = 0;
   let touchEndX = 0;
   let touchEndY = 0;
+  let initialTouchSlide = 0;
   let initialTouchDistance = 0;
 
   document.addEventListener('touchstart', (e) => {
@@ -896,21 +897,22 @@
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
+      initialTouchSlide = currentSlide;
     }
   }, { passive: true });
 
   document.addEventListener('touchmove', (e) => {
     if (e.touches.length === 2) {
-      e.preventDefault();
       touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
       touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
       const currentTouchDistance = Math.hypot(
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-
+      
       // Only trigger if the fingers haven't moved too far apart or together
       if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
+        e.preventDefault();
         const deltaX = touchEndX - touchStartX;
         const deltaY = touchEndY - touchStartY;
         const screenWidth = window.innerWidth;
@@ -918,9 +920,7 @@
 
         // Check if the horizontal movement is greater than the vertical movement
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          // Calculate how many slides to move based on the touch movement
-          const slideDelta = (deltaX / screenWidth) * totalSlides;
-          const targetSlide = Math.round(currentSlide - slideDelta);
+          const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
           currentSlide = Math.max(0, Math.min(targetSlide, totalSlides));
           updateSlide();
         }
