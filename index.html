@@ -287,48 +287,57 @@
       flex: 1;
     }
 
-    .t-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-      gap: 1rem;
-      width: 100%;
-      height: 75%;
-    }
-
-    .t-top {
-      grid-column: 1 / 3;
-      grid-row: 1;
-    }
-
-    .t-bottom-left {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
-    .t-bottom-right {
-      grid-column: 2;
-      grid-row: 2;
-    }
-
-    .bullet-list {
+    .itemize {
       list-style-type: none;
       padding-left: 0;
     }
 
-    .bullet-list li {
+    .itemize li {
       font-size: 1.8rem;
-      margin-bottom: 1rem;
-      display: flex;
-      align-items: baseline;
+      margin-bottom: 1.5rem;
+      display: block;
+      position: relative;
+      padding-left: 2rem;
     }
 
-    .bullet-list li:before {
+    .itemize li:before {
       content: "•";
       color: #3498db;
       font-weight: bold;
       font-size: 2rem;
       margin-right: 0.8rem;
+      position: absolute;
+      left: 0;
+    }
+
+    .itemize li li {
+      padding-left: 4rem;
+      margin-top: 1.5rem;
+    }
+
+    .itemize li li:before {
+      content: "◦";
+      color: #3498db;
+      font-weight: bold;
+      font-size: 2rem;
+      margin-right: 0.8rem;
+      position: absolute;
+      left: 2rem;
+    }
+
+    .itemize li li li {
+      padding-left: 6rem;
+      margin-top: 1.5rem;
+    }
+
+    .itemize li li li:before {
+      content: "▪";
+      color: #3498db;
+      font-weight: bold;
+      font-size: 2rem;
+      margin-right: 0.8rem;
+      position: absolute;
+      left: 4rem;
     }
 
     .progress-container {
@@ -399,7 +408,6 @@
       background-color: #f5f7fa;
       border-radius: 8px;
       padding: 1.5rem;
-      text-align: center;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
 
@@ -407,6 +415,7 @@
       color: #3498db;
       margin-top: 0;
       font-size: 2.4rem;
+      text-align: center;
     }
 
     .compare-item.highlight {
@@ -507,27 +516,34 @@
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Texts</h2>
-  </div>
+<div class="slide" slide-title="Texts">
   <div class="slide-content">
     <div class="two-columns">
       <div class="column">
         <h3>Point 1</h3>
-        <ul class="bullet-list">
+        <ul class="itemize">
           <li>Point 1.1</li>
           <li>Point 1.2</li>
-          <li>Point 1.3</li>
+          <li>Point 1.3
+            <ul class="itemize">
+              <li>Point 1.3.1</li>
+              <li>Point 1.3.2</li>
+            </ul>
+          </li>
           <li>Point 1.4</li>
         </ul>
       </div>
       <div class="column">
         <h3>Point 2</h3>
-        <ul class="bullet-list">
+        <ul class="itemize">
           <li>Point 2.1</li>
           <li>Point 2.2</li>
-          <li>Point 2.3</li>
+          <li>Point 2.3
+            <ul class="itemize">
+              <li>Point 2.3.1</li>
+              <li>Point 2.3.2</li>
+            </ul>
+          </li>
           <li>Point 2.4</li>
         </ul>
       </div>
@@ -541,10 +557,7 @@
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Figures</h2>
-  </div>
+<div class="slide" slide-title="Figures">
   <div class="slide-content">
     <div class="figure-container">
       <div class="figure-row">
@@ -569,76 +582,67 @@
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Equations</h2>
-  </div>
+<div class="slide" slide-title="Equations">
   <div class="slide-content">
     <div class="two-columns">
       <div class="column">
-        <h3>Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">repo</a></h3>
+        <h3>Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">Github repo.</a></h3>
         <p class="equation">
-          $\ket{\psi} = \alpha\ket{0} + \beta\ket{1}$
+          \ket{\psi} = \alpha\ket{0} + \beta\ket{1}
         </p>
         <p class="equation">
-          $\ip{\psi}{\psi} = 1$
+          \ip{\psi}{\psi} = 1
         </p>
         <p class="equation">
-          $\dyad{\psi}{\varphi}$
+          \dyad{\psi}{\varphi}
         </p>
       </div>
       <div class="column">
-        <h3>Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">page</a></h3>
+        <h3>Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">Github page.</a></h3>
         <p class="equation">
-          $[\q, \p] = i\hbar$
+          [\q, \p] = i\hbar
         </p>
         <p class="equation">
-          $\a = \frac{1}{\sqrt{2}}(\q + i\p)$
+          \a = \frac{1}{\sqrt{2}}(\q + i\p)
         </p>
         <p class="equation">
-          $O = \frac{1}{\pi} \int \tr(O \D{-\alpha}) \D{\alpha} \dd^2\alpha$
+          O = \frac{1}{\pi} \int \tr(O \D{-\alpha}) \D{\alpha} \dd^2\alpha
         </p>
       </div>
-    </div>
-    <div class="footnote">
-      <p><span class="footnote-ref">repo</span> Github repo. <span class="footnote-ref">page</span> Github page.</p>
     </div>
   </div>
 </div>
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Comparisons</h2>
-  </div>
+<div class="slide" slide-title="Comparisons">
   <div class="slide-content">
     <div class="compare-table">
       <div class="compare-item">
-        <h3>Point 1</h3>
-        <ul class="bullet-list">
-          <li>Point 1.1</li>
-          <li>Point 1.2</li>
-          <li>Point 1.3</li>
-          <li>Point 1.4</li>
+        <h3>Powerpoint</h3>
+        <ul class="itemize">
+          <li>Mouse marathons for aligning anything</li>
+          <li>Is that WordArt from the Clinton administration?</li>
+          <li>Crashes precisely before you save</li>
+          <li>I gave up on typing equations after the second slide</li>
         </ul>
       </div>
       <div class="compare-item highlight">
-        <h3>Point 2</h3>
-        <ul class="bullet-list">
-          <li>Point 2.1</li>
-          <li>Point 2.2</li>
-          <li>Point 2.3</li>
-          <li>Point 2.4</li>
+        <h3>HTML</h3>
+        <ul class="itemize">
+          <li>Tags and scripts are just morning coffee for PhD students</li>
+          <li>Embed everything</li>
+          <li>Runs on potato</li>
+          <li>Interactive animations that make audience forget you skipped a proof</li>
         </ul>
       </div>
       <div class="compare-item">
-        <h3>Point 3</h3>
-        <ul class="bullet-list">
-          <li>Point 3.1</li>
-          <li>Point 3.2</li>
-          <li>Point 3.3</li>
-          <li>Point 3.4</li>
+        <h3>Latex Beamer</h3>
+        <ul class="itemize">
+          <li>Error: unexpected &#125; in line 342</li>
+          <li>Let me spend 6 hours moving this image 2 pixels left</li>
+          <li>Works flawlessly until you add that one image format</li>
+          <li>My forty-seven theorem proofs compensate for my Comic Sans title</li>
         </ul>
       </div>
     </div>
@@ -647,10 +651,7 @@
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Table</h2>
-  </div>
+<div class="slide" slide-title="Table">
   <div class="slide-content">
     <table>
       <thead>
@@ -658,7 +659,6 @@
           <th>Point 1.1</th>
           <th>Point 1.2</th>
           <th>Point 1.3</th>
-          <th>Point 1.4</th>
         </tr>
       </thead>
       <tbody>
@@ -666,19 +666,16 @@
           <td>Point 2.1</td>
           <td>Point 2.2</td>
           <td>Point 2.3</td>
-          <td>Point 2.4</td>
         </tr>
         <tr>
           <td>Point 3.1</td>
           <td>Point 3.2</td>
           <td>Point 3.3</td>
-          <td>Point 3.4</td>
         </tr>
         <tr>
           <td>Point 4.1</td>
           <td>Point 4.2</td>
           <td>Point 4.3</td>
-          <td>Point 4.4</td>
         </tr>
       </tbody>
     </table>
@@ -687,10 +684,7 @@
 
 
 
-<div class="slide">
-  <div class="slide-header">
-    <h2>Animations</h2>
-  </div>
+<div class="slide" slide-title="Animations">
   <div class="slide-content">
     <div class="animation-container">
       <div id="animated-ball" class="animated-element"></div>
@@ -771,7 +765,51 @@
   const slides = document.querySelectorAll('.slide');
   const slideNumber = document.querySelector('.slide-number');
   const progressBar = document.querySelector('.progress-bar');
-  let currentSlide = 0;
+  let currentSlide = 0, citeIdx = 0;
+
+  // Add automatic header generation
+  slides.forEach(slide => {
+    const title = slide.getAttribute('slide-title');
+    if (title) {
+      const header = document.createElement('div');
+      header.className = 'slide-header';
+      const h2 = document.createElement('h2');
+      h2.textContent = title;
+      header.appendChild(h2);
+      slide.insertBefore(header, slide.firstChild);
+    }
+
+    slide.querySelectorAll('.equation').forEach(equation => {
+      const content = equation.textContent.trim();
+      if (!content.startsWith('$') && !content.endsWith('$')) {
+        equation.textContent = `$${content}$`;
+      }
+    });
+
+    const footnoteCites = slide.querySelectorAll('.footnote-cite');
+    if (footnoteCites.length > 0) {
+      let footnoteContainer = slide.querySelector('.footnote');
+      if (!footnoteContainer) {
+        footnoteContainer = document.createElement('div');
+        footnoteContainer.className = 'footnote';
+        const footnoteParagraph = document.createElement('p');
+        footnoteContainer.appendChild(footnoteParagraph);
+        slide.querySelector('.slide-content').appendChild(footnoteContainer);
+      }
+
+      // Add footnote entries
+      const footnoteParagraph = footnoteContainer.querySelector('p');
+      footnoteCites.forEach((cite, index) => {
+        citeIdx++;
+        const footnoteText = `[${citeIdx}] ${cite.textContent.trim()}`;
+        cite.textContent = `[${citeIdx}]`;
+        if (index > 0) {
+          footnoteParagraph.appendChild(document.createTextNode(' '));
+        }
+        footnoteParagraph.appendChild(document.createTextNode(footnoteText));
+      });
+    }
+  });
 
   function updateSlide() {
     slides.forEach(slide => slide.classList.remove('active'));
@@ -797,19 +835,6 @@
       updateSlide();
     }
   }
-
-  // Automate cite number
-  const footnoteRefs = document.querySelectorAll('.footnote-ref');
-  const footnoteCites = document.querySelectorAll('.footnote-cite');
-
-  footnoteCites.forEach((cite, index) => {
-    const key = cite.textContent.trim();
-    const matchingRef = Array.from(footnoteRefs).find(ref => ref.textContent.trim() === key);
-    if (matchingRef) {
-      cite.textContent = `[${index + 1}]`;
-      matchingRef.textContent = `[${index + 1}]`;
-    }
-  });
 
   // Read url params
   const urlParams = new URLSearchParams(window.location.search);
@@ -854,6 +879,51 @@
 
       accumulatedDelta = 0;
     }, 50);
+  }, { passive: false });
+
+  // Touch gesture support for mobile devices
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchEndX = 0;
+  let touchEndY = 0;
+  let initialTouchDistance = 0;
+
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      initialTouchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+    }
+  }, { passive: true });
+
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+      touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+      const currentTouchDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+
+      // Only trigger if the fingers haven't moved too far apart or together
+      if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
+
+        // Check if the horizontal movement is greater than the vertical movement
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          if (deltaX > 50) { // Swipe right
+            prevSlide();
+          } else if (deltaX < -50) { // Swipe left
+            nextSlide();
+          }
+        }
+      }
+    }
   }, { passive: false });
 
 </script>
