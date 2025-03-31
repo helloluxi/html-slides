@@ -155,6 +155,29 @@
       background-color: rgba(255, 255, 255, 0.7);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-arrow {
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: #3498db;
+      transition: color 0.3s ease;
+    }
+
+    .nav-arrow:hover {
+      color: #2980b9;
+    }
+
+    .nav-arrow.disabled {
+      color: #bdc3c7;
+      cursor: not-allowed;
+    }
+
+    .nav-arrow.disabled:hover {
+      color: #bdc3c7;
     }
 
     table {
@@ -308,6 +331,8 @@
       margin-right: 0.8rem;
       position: absolute;
       left: 0;
+      top: 0;
+      line-height: 1;
     }
 
     .itemize li li {
@@ -323,6 +348,8 @@
       margin-right: 0.8rem;
       position: absolute;
       left: 2rem;
+      top: 0;
+      line-height: 1;
     }
 
     .itemize li li li {
@@ -338,6 +365,8 @@
       margin-right: 0.8rem;
       position: absolute;
       left: 4rem;
+      top: 0;
+      line-height: 1;
     }
 
     .progress-container {
@@ -759,11 +788,15 @@
 </div>
 <div class="progress-container">
   <div class="progress-bar"></div>
-  <div class="slide-number">1 / 1</div>
+  <div class="slide-number">
+    <span class="nav-arrow" onclick="prevSlide()">&lt;</span>
+    <span id="slide-number-text">1 / 1</span>
+    <span class="nav-arrow" onclick="nextSlide()">&gt;</span>
+  </div>
 </div>
 <script>
   const slides = document.querySelectorAll('.slide');
-  const slideNumber = document.querySelector('.slide-number');
+  const slideNumber = document.querySelector('#slide-number-text');
   const progressBar = document.querySelector('.progress-bar');
   let currentSlide = 0, citeIdx = 0;
 
@@ -820,6 +853,22 @@
     const url = new URL(window.location.href);
     url.searchParams.set('p', currentSlide);
     window.history.replaceState({}, '', url);
+
+    // Update navigation arrows
+    const prevArrow = document.querySelector('.nav-arrow:first-child');
+    const nextArrow = document.querySelector('.nav-arrow:last-child');
+    
+    if (currentSlide === 0) {
+      prevArrow.classList.add('disabled');
+    } else {
+      prevArrow.classList.remove('disabled');
+    }
+    
+    if (currentSlide === slides.length - 1) {
+      nextArrow.classList.add('disabled');
+    } else {
+      nextArrow.classList.remove('disabled');
+    }
   }
 
   function nextSlide() {
