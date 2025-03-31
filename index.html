@@ -623,26 +623,26 @@
         <ul class="itemize">
           <li>Mouse marathons for aligning anything</li>
           <li>Is that WordArt from the Clinton administration?</li>
-          <li>Crashes precisely before you save</li>
           <li>I gave up on typing equations after the second slide</li>
+          <li>Crashes precisely before you save</li>
         </ul>
       </div>
       <div class="compare-item highlight">
         <h3>HTML</h3>
         <ul class="itemize">
           <li>Tags and scripts are just morning coffee for PhD students</li>
-          <li>Embed everything</li>
-          <li>Runs on potato</li>
           <li>Interactive animations that make audience forget you skipped a proof</li>
+          <li>Present anywhere with a browser, even on ad boards</li>
+          <li>Just fetch</li>
         </ul>
       </div>
       <div class="compare-item">
         <h3>Latex Beamer</h3>
         <ul class="itemize">
+          <li>Compiling &#x27F3;</li>
           <li>Error: unexpected &#125; in line 342</li>
           <li>Let me spend 6 hours moving this image 2 pixels left</li>
-          <li>Works flawlessly until you add that one image format</li>
-          <li>My forty-seven theorem proofs compensate for my Comic Sans title</li>
+          <li>My 47 theorem proofs compensate for my Comic Sans title</li>
         </ul>
       </div>
     </div>
@@ -913,14 +913,16 @@
       if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
         const deltaX = touchEndX - touchStartX;
         const deltaY = touchEndY - touchStartY;
+        const screenWidth = window.innerWidth;
+        const totalSlides = slides.length - 1;
 
         // Check if the horizontal movement is greater than the vertical movement
         if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          if (deltaX > 50) { // Swipe right
-            prevSlide();
-          } else if (deltaX < -50) { // Swipe left
-            nextSlide();
-          }
+          // Calculate how many slides to move based on the touch movement
+          const slideDelta = (deltaX / screenWidth) * totalSlides;
+          const targetSlide = Math.round(currentSlide - slideDelta);
+          currentSlide = Math.max(0, Math.min(targetSlide, totalSlides));
+          updateSlide();
         }
       }
     }
