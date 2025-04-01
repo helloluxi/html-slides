@@ -6,30 +6,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>HTML Slides Demo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
   <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
           TeX: { 
-              equationNumbers: { autoNumber: "AMS" },
-              Macros: {
-                  ket: ["\\left| #1 \\right\\rangle", 1],
-                  bra: ["\\left\\langle #1 \\right|", 1],
-                  ip: ["\\left\\langle #1 \\middle| #2 \\right\\rangle", 2],
-                  dyad: ["\\left| #1 \\right\\rangle \\! \\left\\langle #2 \\right|", 2],
-                  q: "\\hat{q}",
-                  p: "\\hat{p}",
-                  a: "\\hat{a}",
-                  n: "\\hat{n}",
-                  sx: "\\sigma_x",
-                  sy: "\\sigma_y",
-                  sz: "\\sigma_z",
-                  D: ["\\mathcal{D}\\left( #1 \\right)", 1],
-                  S: ["\\mathcal{S}\\left( #1 \\right)", 1],
-                  R: ["\\mathcal{R}\\left( #1 \\right)", 1],
-                  tr: "\\text{Tr}",
-                  dd: "\\mathrm{d}",
-              }
-          }
+            equationNumbers: { autoNumber: "AMS" },
+            Macros: {
+                ket: ["\\left| #1 \\right\\rangle", 1],
+                bra: ["\\left\\langle #1 \\right|", 1],
+                ip: ["\\left\\langle #1 \\middle| #2 \\right\\rangle", 2],
+                dyad: ["\\left| #1 \\right\\rangle \\! \\left\\langle #2 \\right|", 2],
+                q: "\\hat{q}",
+                p: "\\hat{p}",
+                a: "\\hat{a}",
+                n: "\\hat{n}",
+                sx: "\\sigma_x",
+                sy: "\\sigma_y",
+                sz: "\\sigma_z",
+                D: ["\\mathcal{D}\\left( #1 \\right)", 1],
+                S: ["\\mathcal{S}\\left( #1 \\right)", 1],
+                R: ["\\mathcal{R}\\left( #1 \\right)", 1],
+                tr: "\\text{Tr}",
+                dd: "\\mathrm{d}",
+            }
+        }
       });
   </script>
   <style>
@@ -58,11 +59,11 @@
     }
 
     .slide {
-      width: 100vw; /* Changed from 90vw to 100vw */
-      height: 100vh; /* Changed from 90vh to 100vh */
+      width: 100vw;
+      height: 100vh;
       background: white;
-      border-radius: 0; /* Removed border-radius */
-      box-shadow: none; /* Removed box-shadow */
+      border-radius: 0;
+      box-shadow: none;
       box-sizing: border-box;
       display: none;
     }
@@ -83,7 +84,7 @@
       width: 100%;
       max-width: 100%;
       height: calc(100% - 60px);
-      padding: 3rem;
+      padding: 0 3rem;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
@@ -124,6 +125,57 @@
       font-size: 2rem;
       color: #2c3e50;
       margin: 0;
+    }
+
+    .itemize {
+      margin: 0;
+      padding: 0;
+    }
+
+    .itemize li {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    .itemize li:before {
+      color: #3498db;
+      font-weight: bold;
+      font-size: 2rem;
+      margin-right: 0.8rem;
+      position: absolute;
+      left: 0;
+      top: 0;
+      line-height: 1;
+    }
+
+    .itemize li ul li {
+      margin-top: 0.6rem;
+    }
+
+    ul {
+      list-style-type: none;
+      padding-left: 0;
+      margin: 0;
+    }
+
+    ul li {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
+      padding-left: 2rem;
+      position: relative;
+    }
+
+    ul li:before {
+      content: "•";
+      color: #3498db;
+      font-weight: bold;
+      font-size: 2rem;
+      position: absolute;
+      left: 0;
+      top: 0;
+      line-height: 1;
     }
 
     label {
@@ -206,6 +258,11 @@
     .figure {
       text-align: center;
       margin-bottom: 1rem;
+    }
+
+    .figure-content {
+      display: inline-block;
+      transform-origin: center center;
     }
 
     .figure img {
@@ -300,73 +357,45 @@
       color: #555;
     }
 
-    .two-columns {
-      display: flex;
-      justify-content: space-between;
+    /* Unified column system */
+    .columns {
+      display: grid;
       gap: 2rem;
+      width: 100%;
+      padding: 0;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+    }
+
+    .columns[data-cols="2"] {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .columns[data-cols="3"] {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .columns[data-cols="4"] {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    /* Weight-based columns */
+    .columns[data-weights] {
+      grid-template-columns: var(--col-weights);
     }
 
     .column {
-      flex: 1;
+      background-color: #f5f7fa;
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
-    .itemize {
-      list-style-type: none;
-      padding-left: 0;
-    }
-
-    .itemize li {
-      font-size: 1.8rem;
+    .column h3 {
+      color: #3498db;
       margin-bottom: 1.5rem;
-      display: block;
-      position: relative;
-      padding-left: 2rem;
-    }
-
-    .itemize li:before {
-      content: "•";
-      color: #3498db;
-      font-weight: bold;
-      font-size: 2rem;
-      margin-right: 0.8rem;
-      position: absolute;
-      left: 0;
-      top: 0;
-      line-height: 1;
-    }
-
-    .itemize li li {
-      padding-left: 4rem;
-      margin-top: 1.5rem;
-    }
-
-    .itemize li li:before {
-      content: "◦";
-      color: #3498db;
-      font-weight: bold;
-      font-size: 2rem;
-      margin-right: 0.8rem;
-      position: absolute;
-      left: 2rem;
-      top: 0;
-      line-height: 1;
-    }
-
-    .itemize li li li {
-      padding-left: 6rem;
-      margin-top: 1.5rem;
-    }
-
-    .itemize li li li:before {
-      content: "▪";
-      color: #3498db;
-      font-weight: bold;
-      font-size: 2rem;
-      margin-right: 0.8rem;
-      position: absolute;
-      left: 4rem;
-      top: 0;
-      line-height: 1;
+      text-align: center;
+      font-size: 2.4rem;
     }
 
     .progress-container {
@@ -456,43 +485,22 @@
       content: none;
     }
 
-    .figure-container {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      width: 100%;
-      height: 100%;
-      align-items: center;
-    }
-
     .figure-row {
       display: flex;
-      gap: 1rem;
+      gap: 2rem;
       justify-content: center;
+      align-items: flex-start;
       width: 100%;
-    }
-
-    .figure-row:first-child {
-      width: 100%;
-    }
-
-    .figure-row:last-child {
-      width: 100%;
-    }
-
-    .figure-row:last-child .figure {
-      flex: 1;
-      max-width: 45%;
-    }
-
-    .figure-row:first-child .figure {
-      max-width: 90%;
+      flex-wrap: wrap;
     }
 
     .figure {
-      text-align: center;
-      margin-bottom: 1rem;
-      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      min-width: 0;
+      max-width: 100%;
     }
 
     .figure img {
@@ -507,342 +515,68 @@
       font-style: italic;
       color: #555;
       font-size: 1.8rem;
+      text-align: center;
+      width: 100%;
     }
   </style>
 </head>
 
 <body>
 <div class="slides-container" id="slides-container">
-
-
-
-<div class="slide title-slide">
-  <div class="slide-content">
-    <h1>HTML Slides</h1>
-    <div>
-      <p class="subtitle">
-        Xi Lu
-      </p>
-      <p class="subsubtitle">
-        School of Mathematical Science, Zhejiang University
-        <br>
-        Department of Electrical and Computer Engineering, NC State University
-      </p>
-    </div>
-    <p id="current-date" style="font-size: 2rem;"></p>
-    <script>
-      const dateElement = document.getElementById('current-date');
-      const currentDate = new Date();
-      const formattedDate = currentDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-      });
-      dateElement.textContent = `${formattedDate}`;
-    </script>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Texts">
-  <div class="slide-content">
-    <div class="two-columns">
-      <div class="column">
-        <h3>Point 1</h3>
-        <ul class="itemize">
-          <li>Point 1.1</li>
-          <li>Point 1.2</li>
-          <li>Point 1.3
-            <ul class="itemize">
-              <li>Point 1.3.1</li>
-              <li>Point 1.3.2</li>
-            </ul>
-          </li>
-          <li>Point 1.4</li>
-        </ul>
-      </div>
-      <div class="column">
-        <h3>Point 2</h3>
-        <ul class="itemize">
-          <li>Point 2.1</li>
-          <li>Point 2.2</li>
-          <li>Point 2.3
-            <ul class="itemize">
-              <li>Point 2.3.1</li>
-              <li>Point 2.3.2</li>
-            </ul>
-          </li>
-          <li>Point 2.4</li>
-        </ul>
-      </div>
-    </div>
-    <div class="quote-container">
-      <p class="quote-text">"This is a funny quote."</p>
-      <p class="quote-author">- Me</p>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Figures">
-  <div class="slide-content">
-    <div class="figure-container">
-      <div class="figure-row">
-        <div class="figure">
-          <img src="https://placehold.co/800x300/e0e0e0/666666/png?text=Figure+1" alt="Figure 1">
-          <div class="figure-caption">Figure 1</div>
-        </div>
-      </div>
-      <div class="figure-row">
-        <div class="figure">
-          <img src="https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+2" alt="Figure 2">
-          <div class="figure-caption">Figure 2</div>
-        </div>
-        <div class="figure">
-          <img src="https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+3" alt="Figure 3">
-          <div class="figure-caption">Figure 3</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Equations">
-  <div class="slide-content">
-    <div class="two-columns">
-      <div class="column">
-        <h3>Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">Github repo.</a></h3>
-        <p class="equation">
-          \ket{\psi} = \alpha\ket{0} + \beta\ket{1}
-        </p>
-        <p class="equation">
-          \ip{\psi}{\psi} = 1
-        </p>
-        <p class="equation">
-          \dyad{\psi}{\varphi}
-        </p>
-      </div>
-      <div class="column">
-        <h3>Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">Github page.</a></h3>
-        <p class="equation">
-          [\q, \p] = i\hbar
-        </p>
-        <p class="equation">
-          \a = \frac{1}{\sqrt{2}}(\q + i\p)
-        </p>
-        <p class="equation">
-          O = \frac{1}{\pi} \int \tr(O \D{-\alpha}) \D{\alpha} \dd^2\alpha
-        </p>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Comparisons">
-  <div class="slide-content">
-    <div class="compare-table">
-      <div class="compare-item">
-        <h3>Powerpoint</h3>
-        <ul class="itemize">
-          <li>Mouse marathons for aligning anything</li>
-          <li>Is that WordArt from the Clinton administration?</li>
-          <li>I gave up on typing equations after the second slide</li>
-          <li>Crashes precisely before you save</li>
-        </ul>
-      </div>
-      <div class="compare-item highlight">
-        <h3>HTML</h3>
-        <ul class="itemize">
-          <li>Tags and scripts are just morning coffee for PhD students</li>
-          <li>Interactive animations that make audience forget you skipped a proof</li>
-          <li>Present anywhere with a browser, even on ad boards</li>
-          <li>Just fetch</li>
-        </ul>
-      </div>
-      <div class="compare-item">
-        <h3>Latex Beamer</h3>
-        <ul class="itemize">
-          <li>Compiling &#x27F3;</li>
-          <li>Error: unexpected &#125; in line 342</li>
-          <li>Let me spend 6 hours moving this image 2 pixels left</li>
-          <li>My 47 theorem proofs compensate for my Comic Sans title</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Table">
-  <div class="slide-content">
-    <table>
-      <thead>
-        <tr>
-          <th>Point 1.1</th>
-          <th>Point 1.2</th>
-          <th>Point 1.3</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Point 2.1</td>
-          <td>Point 2.2</td>
-          <td>Point 2.3</td>
-        </tr>
-        <tr>
-          <td>Point 3.1</td>
-          <td>Point 3.2</td>
-          <td>Point 3.3</td>
-        </tr>
-        <tr>
-          <td>Point 4.1</td>
-          <td>Point 4.2</td>
-          <td>Point 4.3</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-
-
-<div class="slide" slide-title="Animations">
-  <div class="slide-content">
-    <div class="animation-container">
-      <div id="animated-ball" class="animated-element"></div>
-    </div>
-    <div class="slider-container">
-      <label for="animation-slider">This is the best part of HTML slides!</label>
-      <input type="range" id="animation-slider" class="slider" min="0" max="100" value="0"
-        oninput="updateBallPosition(this.value)">
-      <div class="slider-value">Progress: <span id="slider-value">0</span>%</div>
-    </div>
-    <script>
-      function updateBallPosition(value) {
-        const ball = document.getElementById('animated-ball');
-        const sliderValue = document.getElementById('slider-value');
-        ball.style.left = `calc(${value}% - 25px)`;
-        sliderValue.textContent = value;
-      }
-    </script>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-<div class="slide">
-  <div class="slide-content">
-    <div class="figure-container">
-      <div class="figure-row">
-        <div class="figure">
-          <h1 style="font-size: 6rem; color: #3498db; text-align: center;">Thank you!</h1>
-        </div>
-      </div>
-      <div class="figure-row" style="margin-top: 6rem;">
-        <div class="figure">
-          <img src="https://placehold.co/200x200/e0e0e0/666666/png?text=QR+Code+1" alt="QR Code 1">
-          <div class="figure-caption">QR Code 1</div>
-        </div>
-        <div class="figure">
-          <img src="https://placehold.co/200x200/e0e0e0/666666/png?text=QR+Code+2" alt="QR Code 2">
-          <div class="figure-caption">QR Code 2</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  <!-- Content will be loaded here -->
 </div>
 <div class="progress-container">
   <div class="progress-bar"></div>
   <div class="slide-number">
     <span class="nav-arrow" onclick="prevSlide()">&lt;</span>
-    <span id="slide-number-text">1 / 1</span>
+    <span id="slide-number-text">NaN</span>
     <span class="nav-arrow" onclick="nextSlide()">&gt;</span>
   </div>
 </div>
+
 <script>
-  const slides = document.querySelectorAll('.slide');
-  const slideNumber = document.querySelector('#slide-number-text');
-  const progressBar = document.querySelector('.progress-bar');
-  let currentSlide = 0, citeIdx = 0;
-
-  // Add automatic header generation
-  slides.forEach(slide => {
-    const title = slide.getAttribute('slide-title');
-    if (title) {
-      const header = document.createElement('div');
-      header.className = 'slide-header';
-      const h2 = document.createElement('h2');
-      h2.textContent = title;
-      header.appendChild(h2);
-      slide.insertBefore(header, slide.firstChild);
+  const renderer = new marked.Renderer();
+  renderer.heading = function(text, level) {
+    if (level === 1) {
+      return `<div class="slide title-slide">
+        <div class="slide-content">
+          <h1>${text}</h1>`;
     }
-
-    slide.querySelectorAll('.equation').forEach(equation => {
-      const content = equation.textContent.trim();
-      if (!content.startsWith('$') && !content.endsWith('$')) {
-        equation.textContent = `$${content}$`;
-      }
-    });
-
-    const footnoteCites = slide.querySelectorAll('.footnote-cite');
-    if (footnoteCites.length > 0) {
-      let footnoteContainer = slide.querySelector('.footnote');
-      if (!footnoteContainer) {
-        footnoteContainer = document.createElement('div');
-        footnoteContainer.className = 'footnote';
-        const footnoteParagraph = document.createElement('p');
-        footnoteContainer.appendChild(footnoteParagraph);
-        slide.querySelector('.slide-content').appendChild(footnoteContainer);
-      }
-
-      // Add footnote entries
-      const footnoteParagraph = footnoteContainer.querySelector('p');
-      footnoteCites.forEach((cite, index) => {
-        citeIdx++;
-        const footnoteText = `[${citeIdx}] ${cite.textContent.trim()}`;
-        cite.textContent = `[${citeIdx}]`;
-        if (index > 0) {
-          footnoteParagraph.appendChild(document.createTextNode(' '));
-        }
-        footnoteParagraph.appendChild(document.createTextNode(footnoteText));
-      });
+    if (level === 2) {
+      return `</div></div><div class="slide" slide-title="${text}">
+        <div class="slide-content">`;
     }
+    return `<h${level}>${text}</h${level}>`;
+  };
+
+  marked.setOptions({
+    breaks: true,
+    gfm: true,
+    sanitize: false,
+    smartLists: true,
+    smartypants: true,
+    headerIds: false,
+    mangle: false,
+    pedantic: true
   });
+
+  renderer.list = function(body, ordered) {
+    const type = ordered ? 'ol' : 'ul';
+    return `<${type} class="itemize">${body}</${type}>`;
+  };
+
+  renderer.listitem = function(text) {
+    return `<li>${text}</li>`;
+  };
+
+  renderer.link = function(href, title, text) {
+    return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
+  };
+
+  let currentSlide = 0;
+  let slides = [];
+  let slideNumber;
+  let progressBar;
 
   function updateSlide() {
     slides.forEach(slide => slide.classList.remove('active'));
@@ -852,9 +586,8 @@
     progressBar.style.width = `${(adjustedSlideNumber / (slides.length - 1)) * 100}%`;
     const url = new URL(window.location.href);
     url.searchParams.set('p', currentSlide);
-    window.history.replaceState({}, '', url);
+    history.replaceState({}, '', url);
 
-    // Update navigation arrows
     const prevArrow = document.querySelector('.nav-arrow:first-child');
     const nextArrow = document.querySelector('.nav-arrow:last-child');
     
@@ -885,98 +618,263 @@
     }
   }
 
-  // Read url params
-  const urlParams = new URLSearchParams(window.location.search);
-  const slideParam = urlParams.get('p');
-  if (slideParam) {
-    const parsedSlide = parseInt(slideParam) || 0;
-    currentSlide = Math.max(0, Math.min(parsedSlide, slides.length - 1));
+  function initializeSlides() {
+    slides = document.querySelectorAll('.slide');
+    slideNumber = document.querySelector('#slide-number-text');
+    progressBar = document.querySelector('.progress-bar');
+    let citeIdx = 0;
+
+    document.querySelectorAll('.columns').forEach(columns => {
+      if (columns.hasAttribute('data-weights')) {
+        const weights = columns.getAttribute('data-weights').split(' ');
+        columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
+      } else {
+        const columnCount = columns.querySelectorAll('.column').length;
+        if (columnCount > 0) {
+          const weights = Array(columnCount).fill('1fr').join(' ');
+          columns.style.setProperty('--col-weights', weights);
+        }
+      }
+    });
+
+    slides.forEach(slide => {
+      const title = slide.getAttribute('slide-title');
+      if (title) {
+        const header = document.createElement('div');
+        header.className = 'slide-header';
+        const h2 = document.createElement('h2');
+        h2.textContent = title;
+        header.appendChild(h2);
+        slide.insertBefore(header, slide.firstChild);
+      }
+
+      slide.querySelectorAll('.equation').forEach(equation => {
+        const content = equation.textContent.trim();
+        if (!content.startsWith('$') && !content.endsWith('$')) {
+          equation.textContent = `$${content}$`;
+        }
+      });
+
+      const footnoteCites = slide.querySelectorAll('.footnote-cite');
+      if (footnoteCites.length > 0) {
+        let footnoteContainer = slide.querySelector('.footnote');
+        if (!footnoteContainer) {
+          footnoteContainer = document.createElement('div');
+          footnoteContainer.className = 'footnote';
+          const footnoteParagraph = document.createElement('p');
+          footnoteContainer.appendChild(footnoteParagraph);
+          slide.querySelector('.slide-content').appendChild(footnoteContainer);
+        }
+
+        const footnoteParagraph = footnoteContainer.querySelector('p');
+        footnoteCites.forEach((cite, index) => {
+          citeIdx++;
+          const footnoteText = `[${citeIdx}] ${cite.textContent.trim()}`;
+          cite.textContent = `[${citeIdx}]`;
+          if (index > 0) {
+            footnoteParagraph.appendChild(document.createTextNode(' '));
+          }
+          footnoteParagraph.appendChild(document.createTextNode(footnoteText));
+        });
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') nextSlide();
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
+    });
+    
+    let wheelTimeout;
+    let accumulatedDelta = 0;
+
+    document.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      accumulatedDelta += e.deltaY;
+
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        const steps = Math.floor(Math.abs(accumulatedDelta) / 100);
+        const direction = accumulatedDelta > 0 ? 1 : -1;
+        for (let i = 0; i < steps; i++) {
+          if (direction > 0) {
+            nextSlide();
+          } else {
+            prevSlide();
+          }
+        }
+        if (currentSlide > 0 && currentSlide < slides.length - 1) {
+          slides[currentSlide].classList.add('fade-in');
+          setTimeout(() => {
+            slides[currentSlide].classList.remove('fade-in');
+          }, 1000);
+        }
+
+        accumulatedDelta = 0;
+      }, 50);
+    }, { passive: false });
+
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let initialTouchSlide = 0;
+    let initialTouchDistance = 0;
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        initialTouchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        initialTouchSlide = currentSlide;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        const currentTouchDistance = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        
+        if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
+          e.preventDefault();
+          const deltaX = touchEndX - touchStartX;
+          const deltaY = touchEndY - touchStartY;
+          const screenWidth = window.innerWidth;
+          const totalSlides = slides.length - 1;
+
+          if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
+            currentSlide = Math.max(0, Math.min(targetSlide, totalSlides));
+            updateSlide();
+          }
+        }
+      }
+    }, { passive: false });
   }
-  updateSlide();
 
-  // Keyboard navigation
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') nextSlide();
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
-  });
-  
-  // Navigation with mouse wheel
-  let wheelTimeout;
-  let accumulatedDelta = 0;
-
-  document.addEventListener('wheel', (e) => {
-    e.preventDefault();
-    accumulatedDelta += e.deltaY;
-
-    clearTimeout(wheelTimeout);
-    wheelTimeout = setTimeout(() => {
-      const steps = Math.floor(Math.abs(accumulatedDelta) / 100); // Adjust sensitivity as needed
-      const direction = accumulatedDelta > 0 ? 1 : -1;
-      for (let i = 0; i < steps; i++) {
-        if (direction > 0) {
-          nextSlide();
-        } else {
-          prevSlide();
-        }
-      }
-      if (currentSlide > 0 && currentSlide < slides.length - 1) {
-        slides[currentSlide].classList.add('fade-in');
-        setTimeout(() => {
-          slides[currentSlide].classList.remove('fade-in');
-        }, 1000); // Animation duration
-      }
-
-      accumulatedDelta = 0;
-    }, 50);
-  }, { passive: false });
-
-  // Touch gesture support for mobile devices
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touchEndX = 0;
-  let touchEndY = 0;
-  let initialTouchSlide = 0;
-  let initialTouchDistance = 0;
-
-  document.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-      touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      initialTouchDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      initialTouchSlide = currentSlide;
-    }
-  }, { passive: true });
-
-  document.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
-      touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-      touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-      const currentTouchDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
+  async function loadContent() {
+    try {
+      const response = await fetch('main.md');
+      const text = await response.text();
       
-      // Only trigger if the fingers haven't moved too far apart or together
-      if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
-        e.preventDefault();
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-        const screenWidth = window.innerWidth;
-        const totalSlides = slides.length - 1;
+      const html = marked.parse(text, { 
+        renderer,
+        headerIds: false,
+        mangle: false,
+        pedantic: true
+      });
+      
+      const tempContainer = document.createElement('div');
+      tempContainer.innerHTML = html;
+      
+      function processDivContent(element) {
+        const children = Array.from(element.childNodes);
+        children.forEach(child => {
+          if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
+            if (child.parentNode.tagName === 'DIV') {
+              const parsed = marked.parse(child.textContent, {
+                renderer,
+                headerIds: false,
+                mangle: false,
+                pedantic: true
+              });
+              const tempDiv = document.createElement('div');
+              tempDiv.innerHTML = parsed;
+              child.parentNode.replaceChild(tempDiv, child);
+            }
+          } else if (child.nodeType === Node.ELEMENT_NODE) {
+            if (child.tagName === 'DIV') {
+              processDivContent(child);
+            }
+            if (child.tagName === 'DIV' && child.className === 'figure') {
+              const img = child.getAttribute('img');
+              const caption = child.getAttribute('caption');
+              const ratio = child.getAttribute('ratio');
 
-        // Check if the horizontal movement is greater than the vertical movement
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-          const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
-          currentSlide = Math.max(0, Math.min(targetSlide, totalSlides));
-          updateSlide();
-        }
+              if (img) {
+                const imgElement = document.createElement('img');
+                imgElement.src = img;
+                imgElement.alt = caption;
+                imgElement.style.width = ratio ? `${ratio * 100}%` : '100%';
+                imgElement.style.height = 'auto';
+                child.appendChild(imgElement);
+              }
+
+              if (caption) {
+                const captionElement = document.createElement('div');
+                captionElement.className = 'figure-caption';
+                captionElement.textContent = caption;
+                child.appendChild(captionElement);
+              }
+            }
+          }
+        });
       }
-    }
-  }, { passive: false });
+      
+      const slidesContainer = document.getElementById('slides-container');
+      slidesContainer.innerHTML = '';
+      
+      let currentContent = '';
+      
+      const nodes = Array.from(tempContainer.childNodes);
+      
+      nodes.forEach((node, index) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          if (node.tagName === 'DIV' && node.className === 'slide title-slide') {
+            if (currentSlide) {
+              currentSlide.innerHTML += currentContent + '</div></div>';
+              slidesContainer.appendChild(currentSlide);
+              currentContent = '';
+            }
+            currentSlide = node.cloneNode(true);
+            processDivContent(currentSlide);
+          } else if (node.tagName === 'DIV' && node.className === 'slide') {
+            if (currentSlide) {
+              currentSlide.innerHTML += currentContent + '</div></div>';
+              slidesContainer.appendChild(currentSlide);
+              currentContent = '';
+            }
+            currentSlide = node.cloneNode(true);
+            processDivContent(currentSlide);
+          } else {
+            currentContent += node.outerHTML;
+          }
+        }
+      });
+      
+      if (currentSlide) {
+        currentSlide.innerHTML += currentContent + '</div></div>';
+        slidesContainer.appendChild(currentSlide);
+      }
 
+      const scripts = slidesContainer.getElementsByTagName('script');
+      for (let script of scripts) {
+        const newScript = document.createElement('script');
+        newScript.textContent = script.textContent;
+        script.parentNode.replaceChild(newScript, script);
+      }
+
+      initializeSlides();
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const slideParam = urlParams.get('p');
+      if (slideParam) {
+        const parsedSlide = parseInt(slideParam) || 0;
+        currentSlide = Math.max(0, Math.min(parsedSlide, slides.length - 1));
+      }
+      updateSlide();
+    } catch (error) {
+      console.error('Error loading content:', error);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', loadContent);
 </script>
 </body>
 
