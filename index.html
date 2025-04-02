@@ -90,6 +90,7 @@
       flex-direction: column;
       overflow-y: auto;
       scrollbar-width: thin;
+      touch-action: pan-y;
     }
 
     .slide-content p,
@@ -539,12 +540,13 @@
   renderer.heading = function(text, level) {
     if (level === 1) {
       return `<div class="slide title-slide">
-        <div class="slide-content">
-          <h1>${text}</h1>`;
+<div class="slide-content">
+<h1>${text}</h1>`;
     }
     if (level === 2) {
-      return `</div></div><div class="slide" slide-title="${text}">
-        <div class="slide-content">`;
+      return `</div></div><div class="slide">
+${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
+<div class="slide-content">`;
     }
     return `<h${level}>${text}</h${level}>`;
   };
@@ -638,16 +640,6 @@
     });
 
     slides.forEach(slide => {
-      const title = slide.getAttribute('slide-title');
-      if (title) {
-        const header = document.createElement('div');
-        header.className = 'slide-header';
-        const h2 = document.createElement('h2');
-        h2.textContent = title;
-        header.appendChild(h2);
-        slide.insertBefore(header, slide.firstChild);
-      }
-
       slide.querySelectorAll('.equation').forEach(equation => {
         const content = equation.textContent.trim();
         if (!content.startsWith('$') && !content.endsWith('$')) {
@@ -859,10 +851,8 @@
         newScript.textContent = script.textContent;
         script.parentNode.replaceChild(newScript, script);
       }
-
       
       initializeSlides();
-      console.log(`currentSlide: ${currentSlide} slides: ${slides.length}`);
 
       const urlParams = new URLSearchParams(window.location.search);
       const slideParam = urlParams.get('p');
