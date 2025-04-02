@@ -109,6 +109,8 @@ I = \frac{1}{\pi} \int \dyad{\alpha}{\alpha} \dd^2{\alpha}
 </div>
 </div>
 
+Inline equation: $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\sigma^2}}$.
+
 ## Comparisons
 
 <div class="compare-table">

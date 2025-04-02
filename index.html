@@ -30,6 +30,29 @@
                 tr: "\\text{Tr}",
                 dd: "\\mathrm{d}",
             }
+        },
+        "HTML-CSS": {
+            availableFonts: ["STIX"],
+            linebreaks: { automatic: true },
+            imageFont: null,
+            undefinedFamily: "serif",
+            mtextFontInherit: true,
+            matchFontHeight: true,
+            styles: { '.MathJax_Display': { margin: 0 } },
+            showMathMenu: false,
+            scale: 100
+        },
+        SVG: {
+            linebreaks: { automatic: true },
+            scale: 100
+        },
+        "CommonHTML": {
+            linebreaks: { automatic: true },
+            scale: 100
+        },
+        "PreviewHTML": {
+            linebreaks: { automatic: true },
+            scale: 100
         }
       });
   </script>
@@ -861,6 +884,11 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
         slideIdx = Math.max(0, Math.min(parsedSlide, slides.length - 1));
       }
       updateSlide();
+
+      // Force MathJax to reprocess the content after slides are loaded
+      if (window.MathJax && window.MathJax.Hub) {
+        window.MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
+      }
     } catch (error) {
       console.error('Error loading content:', error);
     }
