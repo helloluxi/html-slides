@@ -611,7 +611,6 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
     progressBar.style.width = `${(adjustedSlideNumber / (slides.length - 1)) * 100}%`;
     const url = new URL(window.location.href);
     url.searchParams.set('p', slideIdx);
-    history.replaceState({}, '', url);
 
     const prevArrow = document.querySelector('.nav-arrow:first-child');
     const nextArrow = document.querySelector('.nav-arrow:last-child');
