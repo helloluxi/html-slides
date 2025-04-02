@@ -573,31 +573,31 @@
     return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
   };
 
-  let currentSlide = 0;
+  let slideIdx = 0;
   let slides = [];
   let slideNumber;
   let progressBar;
 
   function updateSlide() {
     slides.forEach(slide => slide.classList.remove('active'));
-    slides[currentSlide].classList.add('active');
-    const adjustedSlideNumber = currentSlide === 0 ? 0 : currentSlide;
+    slides[slideIdx].classList.add('active');
+    const adjustedSlideNumber = slideIdx === 0 ? 0 : slideIdx;
     slideNumber.textContent = `${adjustedSlideNumber} / ${slides.length - 1}`;
     progressBar.style.width = `${(adjustedSlideNumber / (slides.length - 1)) * 100}%`;
     const url = new URL(window.location.href);
-    url.searchParams.set('p', currentSlide);
+    url.searchParams.set('p', slideIdx);
     history.replaceState({}, '', url);
 
     const prevArrow = document.querySelector('.nav-arrow:first-child');
     const nextArrow = document.querySelector('.nav-arrow:last-child');
     
-    if (currentSlide === 0) {
+    if (slideIdx === 0) {
       prevArrow.classList.add('disabled');
     } else {
       prevArrow.classList.remove('disabled');
     }
     
-    if (currentSlide === slides.length - 1) {
+    if (slideIdx === slides.length - 1) {
       nextArrow.classList.add('disabled');
     } else {
       nextArrow.classList.remove('disabled');
@@ -605,15 +605,15 @@
   }
 
   function nextSlide() {
-    if (currentSlide < slides.length - 1) {
-      currentSlide++;
+    if (slideIdx < slides.length - 1) {
+      slideIdx++;
       updateSlide();
     }
   }
 
   function prevSlide() {
-    if (currentSlide > 0) {
-      currentSlide--;
+    if (slideIdx > 0) {
+      slideIdx--;
       updateSlide();
     }
   }
@@ -702,10 +702,10 @@
             prevSlide();
           }
         }
-        if (currentSlide > 0 && currentSlide < slides.length - 1) {
-          slides[currentSlide].classList.add('fade-in');
+        if (slideIdx > 0 && slideIdx < slides.length - 1) {
+          slides[slideIdx].classList.add('fade-in');
           setTimeout(() => {
-            slides[currentSlide].classList.remove('fade-in');
+            slides[slideIdx].classList.remove('fade-in');
           }, 1000);
         }
 
@@ -728,7 +728,7 @@
           e.touches[0].clientX - e.touches[1].clientX,
           e.touches[0].clientY - e.touches[1].clientY
         );
-        initialTouchSlide = currentSlide;
+        initialTouchSlide = slideIdx;
       }
     }, { passive: true });
 
@@ -750,7 +750,7 @@
 
           if (Math.abs(deltaX) > Math.abs(deltaY)) {
             const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
-            currentSlide = Math.max(0, Math.min(targetSlide, totalSlides));
+            slideIdx = Math.max(0, Math.min(targetSlide, totalSlides));
             updateSlide();
           }
         }
@@ -760,8 +760,7 @@
 
   async function loadContent() {
     try {
-      const response = await fetch('main.md');
-      const text = await response.text();
+      const text = await fetch('./main.md').then(res => res.text());
       
       const html = marked.parse(text, { 
         renderer,
@@ -820,6 +819,7 @@
       const slidesContainer = document.getElementById('slides-container');
       slidesContainer.innerHTML = '';
       
+      let currentSlide = null;
       let currentContent = '';
       
       const nodes = Array.from(tempContainer.childNodes);
@@ -860,13 +860,15 @@
         script.parentNode.replaceChild(newScript, script);
       }
 
+      
       initializeSlides();
+      console.log(`currentSlide: ${currentSlide} slides: ${slides.length}`);
 
       const urlParams = new URLSearchParams(window.location.search);
       const slideParam = urlParams.get('p');
       if (slideParam) {
         const parsedSlide = parseInt(slideParam) || 0;
-        currentSlide = Math.max(0, Math.min(parsedSlide, slides.length - 1));
+        slideIdx = Math.max(0, Math.min(parsedSlide, slides.length - 1));
       }
       updateSlide();
     } catch (error) {
