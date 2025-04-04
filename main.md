@@ -31,25 +31,22 @@
 <div class="columns">
 <div class="column">
 
-### Point 1
-- Point 1.1
-- Point 1.2
-- Point 1.3
-  - Point 1.3.1
-  - Point 1.3.2
-- Point 1.4
+### Instructions
+- Use the arrow keys or mouse scroll to navigate through the slides.
+  - Use double finger swipe on mobile.
+- Use the ` key to zoom in.
+- Use url parameter `?p=` to start from a specific slide.
 
 </div>
 
 <div class="column">
 
-### Point 2
-- Point 2.1
-- Point 2.2
-- Point 2.3
-  - Point 2.3.1
-  - Point 2.3.2
-- Point 2.4
+### Features
+- Instant MathJax
+- Interactive animations
+- Easy version control
+- Easily fetch online resources
+- Easy last-minute changes when presenting on different devices
 
 </div>
 </div>
@@ -117,19 +114,17 @@ Inline equation: $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\si
 <div class="compare-item">
 
 ### Powerpoint
-- Mouse marathons for aligning anything
-- Is that WordArt from the Clinton administration?
-- I gave up on typing equations after the second slide
+- Mouse marathons
+- Nightmare of typing equations
 - Crashes precisely before you save
 
 </div>
 <div class="compare-item highlight">
 
 ### HTML
-- Tags and scripts are just morning coffee for PhD students
-- Interactive animations that make audience forget you skipped a proof
 - Present anywhere with a browser, even on ad boards
-- Just fetch
+- Interactive animations make people forget we have skipped proofs
+- AI has seen more html than anything else...
 
 </div>
 <div class="compare-item">
@@ -138,7 +133,6 @@ Inline equation: $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\si
 - Compiling &#x27F3;
 - Error: unexpected &#125; in line 342
 - Let me spend 6 hours moving this image 2 pixels left
-- My 47 theorem proofs compensate for my Comic Sans title
 
 </div>
 </div>

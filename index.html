@@ -522,7 +522,6 @@
       width: 100%;
     }
 
-    /* Zoom styles */
     .slides-container.zoomed {
       transform-origin: 0 0;
       transition: transform 0.1s ease;
@@ -591,19 +590,41 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
   let isZoomed = false;
   const ZOOM_FACTOR = 2;
 
-  function handleZoom(e) {
-    if (e.altKey) {
-      if (!isZoomed) {
-        isZoomed = true;
-        const slidesContainer = document.getElementById('slides-container');
-        slidesContainer.classList.add('zoomed');
-      }
-      updateZoomPosition(e);
-    } else if (isZoomed) {
+  function resetZoom(e) {
+    if (e.key === '`'){
       isZoomed = false;
       const slidesContainer = document.getElementById('slides-container');
       slidesContainer.classList.remove('zoomed');
-      slidesContainer.style.transform = 'scale(1)';
+      // Get current transform origin and position
+      const currentOrigin = slidesContainer.style.transformOrigin;
+      const currentTransform = slidesContainer.style.transform;
+      
+      // Calculate the current position based on transform
+      const matrix = new DOMMatrix(currentTransform);
+      const currentX = matrix.m41;
+      const currentY = matrix.m42;
+      
+      // Set up the transition
+      slidesContainer.style.transition = 'transform 0.3s ease';
+      
+      // Reset to normal scale while maintaining position
+      slidesContainer.style.transform = `translate(${currentX}px, ${currentY}px) scale(1)`;
+      
+      // After transition completes, reset to default position
+      setTimeout(() => {
+        slidesContainer.style.transition = 'none';
+        slidesContainer.style.transform = 'none';
+        slidesContainer.style.transformOrigin = '0 0';
+      }, 300);
+    }
+  }
+
+  function handleZoom(e) {
+    if (e.key === '`' && !isZoomed) {
+      isZoomed = true;
+      const slidesContainer = document.getElementById('slides-container');
+      slidesContainer.classList.add('zoomed');
+      updateZoomPosition(e);
     }
   }
 
@@ -719,7 +740,7 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
     });
     
     document.addEventListener('keydown', handleZoom);
-    document.addEventListener('keyup', handleZoom);
+    document.addEventListener('keyup', resetZoom);
     document.addEventListener('mousemove', updateZoomPosition);
 
     let wheelTimeout;
