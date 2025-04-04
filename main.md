@@ -42,9 +42,9 @@
 <div class="column">
 
 ### Features
+- Created from Markdown, to help focus on content
 - Instant MathJax
 - Interactive animations
-- Easy version control
 - Easily fetch online resources
 - Easy last-minute changes when presenting on different devices
 
