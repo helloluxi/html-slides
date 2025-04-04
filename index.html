@@ -30,29 +30,6 @@
                 tr: "\\text{Tr}",
                 dd: "\\mathrm{d}",
             }
-        },
-        "HTML-CSS": {
-            availableFonts: ["STIX"],
-            linebreaks: { automatic: true },
-            imageFont: null,
-            undefinedFamily: "serif",
-            mtextFontInherit: true,
-            matchFontHeight: true,
-            styles: { '.MathJax_Display': { margin: 0 } },
-            showMathMenu: false,
-            scale: 100
-        },
-        SVG: {
-            linebreaks: { automatic: true },
-            scale: 100
-        },
-        "CommonHTML": {
-            linebreaks: { automatic: true },
-            scale: 100
-        },
-        "PreviewHTML": {
-            linebreaks: { automatic: true },
-            scale: 100
         }
       });
   </script>
@@ -301,6 +278,8 @@
       font-style: italic;
       color: #555;
       font-size: 1.8rem;
+      text-align: center;
+      width: 100%;
     }
 
     code {
@@ -542,6 +521,12 @@
       text-align: center;
       width: 100%;
     }
+
+    /* Zoom styles */
+    .slides-container.zoomed {
+      transform-origin: 0 0;
+      transition: transform 0.1s ease;
+    }
   </style>
 </head>
 
@@ -562,6 +547,7 @@
   const renderer = new marked.Renderer();
   renderer.heading = function(text, level) {
     if (level === 1) {
+      document.title = text.trim();
       return `<div class="slide title-slide">
 <div class="slide-content">
 <h1>${text}</h1>`;
@@ -602,6 +588,39 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
   let slides = [];
   let slideNumber;
   let progressBar;
+  let isZoomed = false;
+  const ZOOM_FACTOR = 2;
+
+  function handleZoom(e) {
+    if (e.altKey) {
+      if (!isZoomed) {
+        isZoomed = true;
+        const slidesContainer = document.getElementById('slides-container');
+        slidesContainer.classList.add('zoomed');
+      }
+      updateZoomPosition(e);
+    } else if (isZoomed) {
+      isZoomed = false;
+      const slidesContainer = document.getElementById('slides-container');
+      slidesContainer.classList.remove('zoomed');
+      slidesContainer.style.transform = 'scale(1)';
+    }
+  }
+
+  function updateZoomPosition(e) {
+    if (!isZoomed) return;
+    
+    const slidesContainer = document.getElementById('slides-container');
+    const rect = slidesContainer.getBoundingClientRect();
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    
+    const originX = (mouseX / rect.width) * 100;
+    const originY = (mouseY / rect.height) * 100;
+    
+    slidesContainer.style.transformOrigin = `${originX}% ${originY}%`;
+    slidesContainer.style.transform = `scale(${ZOOM_FACTOR})`;
+  }
 
   function updateSlide() {
     slides.forEach(slide => slide.classList.remove('active'));
@@ -611,6 +630,7 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
     progressBar.style.width = `${(adjustedSlideNumber / (slides.length - 1)) * 100}%`;
     const url = new URL(window.location.href);
     url.searchParams.set('p', slideIdx);
+    window.history.replaceState({}, '', url.toString());
 
     const prevArrow = document.querySelector('.nav-arrow:first-child');
     const nextArrow = document.querySelector('.nav-arrow:last-child');
@@ -698,6 +718,10 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
       else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
     });
     
+    document.addEventListener('keydown', handleZoom);
+    document.addEventListener('keyup', handleZoom);
+    document.addEventListener('mousemove', updateZoomPosition);
+
     let wheelTimeout;
     let accumulatedDelta = 0;
 
