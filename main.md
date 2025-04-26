@@ -1,141 +1,102 @@
 # HTML Slides
 
-<div>
-  <p class="subtitle">
-  Xi Lu
-  </p>
-  <p class="subsubtitle">
-  School of Mathematical Science, Zhejiang University
-  <br>
-  Department of Electrical and Computer Engineering, NC State University
-  </p>
-</div>
+\subtitle{Xi Lu}
+\subsubtitle{School of Mathematical Science, Zhejiang University\\Department of Electrical and Computer Engineering, NC State University}
 
-<p id="current-date" style="font-size: 2rem;"></p>
-
-<script>
-    const dateElement = document.getElementById('current-date');
-    if (dateElement) {
-    const currentDate = new Date();
-    const formattedDate = currentDate.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
-    });
-    dateElement.textContent = `${formattedDate}`;
-    }
-</script>
+\today
 
 ## Texts
 
-<div class="columns">
-<div class="column">
-
+\columns
+\column
 ### Instructions
 - Use the arrow keys or mouse scroll to navigate through the slides.
   - Use double finger swipe on mobile.
 - Use the ` key to zoom in.
 - Use url parameter `?p=` to start from a specific slide.
-
-</div>
-
-<div class="column">
-
+\end
+\column
 ### Features
 - Created from Markdown, to help focus on content
 - Instant MathJax
 - Interactive animations
 - Easily fetch online resources
 - Easy last-minute changes when presenting on different devices
+\end
+\end
 
-</div>
-</div>
-
-<div class="quote-container">
-<p class="quote-text">"This is a funny quote."</p>
-<p class="quote-author">- Me</p>
-</div>
+\quote{This is a funny quote.}{Me}
 
 ## Figures
 
-<div class="figure-row">
-  <div class="figure" img="https://placehold.co/800x300/e0e0e0/666666/png?text=Figure+1" caption="Figure 1" ratio="0.45">
-  </div>
-</div>
+\row{
+\figure[0.45]{https://placehold.co/800x300/e0e0e0/666666/png?text=Figure+1}{Figure 1}
+}
 
-<div class="figure-row">
-  <div class="figure" img="https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+2" caption="Figure 2" ratio="0.45">
-  </div>
-  <div class="figure" img="https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+3" caption="Figure 3" ratio="0.45">
-  </div>
-</div>
+\row{
+\figure[0.45]{https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+2}{Figure 2}
+\figure[0.45]{https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+3}{Figure 3}
+}
 
 ## Equations
 
-<div class="columns" data-weights="1fr 1.5fr">
-<div class="column">
-
+\columns[1fr 1.5fr]
+\column
 <p> Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">Github repo.</a> </p>
 
-<p class="equation">
+$$
 \ket{\psi} = \alpha\ket{0} + \beta\ket{1}
-</p>
-<p class="equation">
+$$
+$$
 \ip{\psi}{\psi} = 1
-</p>
-<p class="equation">
+$$
+$$
 [\sx, \sy] = 2i\sz
-</p>
+$$
+\end
 
-</div>
-
-<div class="column">
-
+\column
 <p> Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">Github page.</a> </p>
 
-<p class="equation">
+$$
 [\q, \p] = i
-</p>
-<p class="equation">
+$$
+$$
 \a = \frac{1}{\sqrt{2}}(\q + i\p)
-</p>
-<p class="equation">
+$$
+$$
 I = \frac{1}{\pi} \int \dyad{\alpha}{\alpha} \dd^2{\alpha}
-</p>
+$$
+\end
+\end
 
-</div>
-</div>
-
-Inline equation: $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\sigma^2}}$.
+Inline equation:
+$
+f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\sigma^2}}
+$.
 
 ## Comparisons
 
-<div class="compare-table">
-<div class="compare-item">
-
+\compares
+\compare
 ### Powerpoint
 - Mouse marathons
 - Nightmare of typing equations
 - Crashes precisely before you save
-
-</div>
-<div class="compare-item highlight">
-
+\end
+\compare*
 ### HTML
 - Present anywhere with a browser, even on ad boards
 - Interactive animations make people forget we have skipped proofs
 - AI has seen more html than anything else...
-
-</div>
-<div class="compare-item">
-
+\end
+\compare
 ### Latex Beamer
 - Compiling &#x27F3;
 - Error: unexpected &#125; in line 342
 - Let me spend 6 hours moving this image 2 pixels left
-
-</div>
-</div>
+\end
+\end
 
 ## Tables
 
@@ -190,13 +151,9 @@ Inline equation: $f(x) = \frac{1}{\sqrt{2\pi}\sigma} e^{-\frac{(x - \mu)^2}{2\si
 
 ## 
 
-<div class="figure-row">
-  <h1 style="font-size: 6rem; color: #3498db; text-align: center;">Thank you!</h1>
-</div>
+\centertitle{Thank you!}
 
-<div class="figure-row" style="margin-top: 6rem;">
-  <div class="figure" img="https://placehold.co/300x300/e0e0e0/666666/png?text=QR+Code+1" ratio="0.5" caption="QR Code 1">
-  </div>
-  <div class="figure" img="https://placehold.co/300x300/e0e0e0/666666/png?text=QR+Code+2" ratio="0.5" caption="QR Code 2">
-  </div>
-</div>
+\row{
+\qrcode{https://github.com/helloluxi/html-slides}{Github repo}
+\qrcode{https://helloluxi.github.io/html-slides}{Github page}
+}

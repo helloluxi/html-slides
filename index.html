@@ -7,6 +7,7 @@
   <title>HTML Slides Demo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
   <script type="text/x-mathjax-config">
       MathJax.Hub.Config({
           tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
@@ -492,9 +493,10 @@
       display: flex;
       gap: 2rem;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       width: 100%;
       flex-wrap: wrap;
+      margin-bottom: 2rem;
     }
 
     .figure {
@@ -504,6 +506,7 @@
       flex: 1;
       min-width: 0;
       max-width: 100%;
+      margin: 0 auto;
     }
 
     .figure img {
@@ -525,6 +528,58 @@
     .slides-container.zoomed {
       transform-origin: 0 0;
       transition: transform 0.1s ease;
+    }
+
+    .qr-box {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.2s;
+      width: 100%;
+      max-width: 400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .qr-container {
+      width: 300px;
+      height: 300px;
+      margin: 10px auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background: white;
+      padding: 10px;
+      border-radius: 8px;
+    }
+
+    .qr-container img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .qr-caption {
+      margin-top: 15px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #333;
+      padding: 5px;
+      border-radius: 5px;
+    }
+
+    .qr-error {
+      color: #f44336;
+      font-size: 16px;
+      padding: 10px;
+      background-color: #ffebee;
+      border-radius: 5px;
+      margin: 10px 0;
     }
   </style>
 </head>
@@ -817,11 +872,94 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
     }, { passive: false });
   }
 
+  function initializeQRCodes() {
+    document.querySelectorAll('.qr-container').forEach(container => {
+      const message = container.getAttribute('data-message');
+      if (message) {
+        new QRCode(container, {
+          text: message.trim(),
+          width: 300,
+          height: 300,
+          colorDark: '#000000',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.H
+        });
+      }
+    });
+  }
+
   async function loadContent() {
     try {
       const text = await fetch('./main.md').then(res => res.text());
       
-      const html = marked.parse(text, { 
+      // Preprocess the markdown content
+      const preprocessedText = text
+        // Handle \quote{text}{author}
+        .replace(/\\quote\{([^}]*)\}\{([^}]*)\}/g, (match, text, author) => {
+          return `<div class="quote-container"><p class="quote-text">${text}</p><p class="quote-author">- ${author}</p></div>`;
+        })
+        // Handle \compares
+        .replace(/\\compares/g, () => {
+          return `<div class="compare-table">`;
+        })
+        // Handle \compare*
+        .replace(/\\compare\*/g, () => {
+          return `<div class="compare-item highlight">`;
+        })
+        // Handle \compare
+        .replace(/\\compare/g, () => {
+          return `<div class="compare-item">`;
+        })
+        // Handle \centertitle{...}
+        .replace(/\\centertitle\{([^}]*)\}/g, (match, content) => {
+          return `<h1 style="font-size: 6rem; color: #3498db; text-align: center;">${content}</h1>`;
+        })
+        // Handle \subtitle{...}
+        .replace(/\\subtitle\{([^}]*)\}/g, (match, content) => {
+          content = content.replace(/\\\\/g, '<br>');
+          return `<p class="subtitle">${content}</p>`;
+        })
+        // Handle \subsubtitle{...}
+        .replace(/\\subsubtitle\{([^}]*)\}/g, (match, content) => {
+          content = content.replace(/\\\\/g, '<br>');
+          return `<p class="subsubtitle">${content}</p>`;
+        })
+        // Handle \today
+        .replace(/\\today/g, () => {
+          return `<p id="current-date" style="font-size: 2rem;"></p>`;
+        })
+        // Handle \columns[optional weights]
+        .replace(/\\columns(?:\[([^\]]*)\])?/g, (match, weights) => {
+          return weights ? 
+            `<div class="columns" data-weights="${weights}">` : 
+            `<div class="columns">`;
+        })
+        // Handle \column
+        .replace(/\\column/g, () => {
+          return `<div class="column">`;
+        })
+        // Handle \end
+        .replace(/\\end/g, () => {
+          return `</div>`;
+        })
+        // Handle existing commands
+        .replace(/\\row\s*{((?:[^{}]|{[^{}]*})*)}/g, (match, content) => {
+          return `<div class="figure-row">${content}</div>`;
+        })
+        .replace(/\\figure\[([^\]]*)\]\{([^}]*)\}\{([^}]*)\}/g, (match, ratio, src, caption) => {
+          return `<div class="figure"><img src="${src}" alt="${caption}" style="width: ${ratio * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
+        })
+        .replace(/\\qrcode\{([^}]*)\}\{([^}]*)\}/g, (match, message, caption) => {
+          try {
+            const qrId = 'qr-' + Math.random().toString(36).substr(2, 9);
+            return `<div class="figure"><div class="qr-box"><div class="qr-container" id="${qrId}" data-message="${message}"></div><div class="figure-caption">${caption}</div></div></div>`;
+          } catch (error) {
+            console.error('Error generating QR code:', error);
+            return `<div class="figure"><div class="qr-box"><div class="qr-error">Error generating QR code</div><div class="figure-caption">${caption}</div></div></div>`;
+          }
+        });
+      
+      const html = marked.parse(preprocessedText, { 
         renderer,
         headerIds: false,
         mangle: false,
@@ -849,27 +987,6 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
           } else if (child.nodeType === Node.ELEMENT_NODE) {
             if (child.tagName === 'DIV') {
               processDivContent(child);
-            }
-            if (child.tagName === 'DIV' && child.className === 'figure') {
-              const img = child.getAttribute('img');
-              const caption = child.getAttribute('caption');
-              const ratio = child.getAttribute('ratio');
-
-              if (img) {
-                const imgElement = document.createElement('img');
-                imgElement.src = img;
-                imgElement.alt = caption;
-                imgElement.style.width = ratio ? `${ratio * 100}%` : '100%';
-                imgElement.style.height = 'auto';
-                child.appendChild(imgElement);
-              }
-
-              if (caption) {
-                const captionElement = document.createElement('div');
-                captionElement.className = 'figure-caption';
-                captionElement.textContent = caption;
-                child.appendChild(captionElement);
-              }
             }
           }
         });
@@ -920,6 +1037,7 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
       }
       
       initializeSlides();
+      initializeQRCodes();
 
       const urlParams = new URLSearchParams(window.location.search);
       const slideParam = urlParams.get('p');
@@ -935,6 +1053,18 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
       }
     } catch (error) {
       console.error('Error loading content:', error);
+    }
+
+    // Add a script to update the current date
+    const dateElement = document.getElementById('current-date');
+    if (dateElement) {
+      const currentDate = new Date();
+      const formattedDate = currentDate.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+      });
+      dateElement.textContent = `${formattedDate}`;
     }
   }
 
