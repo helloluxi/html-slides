@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HTML Slides Demo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
@@ -898,17 +898,13 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
         .replace(/\\quote\{([^}]*)\}\{([^}]*)\}/g, (match, text, author) => {
           return `<div class="quote-container"><p class="quote-text">${text}</p><p class="quote-author">- ${author}</p></div>`;
         })
-        // Handle \compares
-        .replace(/\\compares/g, () => {
-          return `<div class="compare-table">`;
+        // Handle \compares* and \compares
+        .replace(/\\compares(\*?)/g, (match, isHighlight) => {
+          return `<div class="compare-table"><div class="compare-item ${isHighlight ? 'highlight' : ''}">`;
         })
-        // Handle \compare*
-        .replace(/\\compare\*/g, () => {
-          return `<div class="compare-item highlight">`;
-        })
-        // Handle \compare
-        .replace(/\\compare/g, () => {
-          return `<div class="compare-item">`;
+        // Handle \compare* and \compare
+        .replace(/\\compare(\*?)/g, (match, isHighlight) => {
+          return `</div><div class="compare-item ${isHighlight ? 'highlight' : ''}">`;
         })
         // Handle \centertitle{...}
         .replace(/\\centertitle\{([^}]*)\}/g, (match, content) => {
@@ -931,16 +927,16 @@ ${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
         // Handle \columns[optional weights]
         .replace(/\\columns(?:\[([^\]]*)\])?/g, (match, weights) => {
           return weights ? 
-            `<div class="columns" data-weights="${weights}">` : 
-            `<div class="columns">`;
+            `<div class="columns" data-weights="${weights}"><div class="column">` : 
+            `<div class="columns"><div class="column">`;
         })
         // Handle \column
         .replace(/\\column/g, () => {
-          return `<div class="column">`;
+          return `</div><div class="column">`;
         })
-        // Handle \end
-        .replace(/\\end/g, () => {
-          return `</div>`;
+        // Handle \endend
+        .replace(/\\endend/g, () => {
+          return `</div></div>`;
         })
         // Handle existing commands
         .replace(/\\row\s*{((?:[^{}]|{[^{}]*})*)}/g, (match, content) => {

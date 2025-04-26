@@ -8,22 +8,23 @@
 ## Texts
 
 \columns
-\column
+
 ### Instructions
 - Use the arrow keys or mouse scroll to navigate through the slides.
   - Use double finger swipe on mobile.
 - Use the ` key to zoom in.
 - Use url parameter `?p=` to start from a specific slide.
-\end
+
 \column
+
 ### Features
 - Created from Markdown, to help focus on content
 - Instant MathJax
 - Interactive animations
 - Easily fetch online resources
 - Easy last-minute changes when presenting on different devices
-\end
-\end
+
+\endend
 
 \quote{This is a funny quote.}{Me}
 
@@ -41,7 +42,7 @@
 ## Equations
 
 \columns[1fr 1.5fr]
-\column
+
 <p> Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">Github repo.</a> </p>
 
 $$
@@ -53,9 +54,9 @@ $$
 $$
 [\sx, \sy] = 2i\sz
 $$
-\end
 
 \column
+
 <p> Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">Github page.</a> </p>
 
 $$
@@ -67,8 +68,8 @@ $$
 $$
 I = \frac{1}{\pi} \int \dyad{\alpha}{\alpha} \dd^2{\alpha}
 $$
-\end
-\end
+
+\endend
 
 Inline equation:
 $
@@ -78,25 +79,21 @@ $.
 ## Comparisons
 
 \compares
-\compare
 ### Powerpoint
 - Mouse marathons
 - Nightmare of typing equations
 - Crashes precisely before you save
-\end
 \compare*
 ### HTML
 - Present anywhere with a browser, even on ad boards
 - Interactive animations make people forget we have skipped proofs
 - AI has seen more html than anything else...
-\end
 \compare
 ### Latex Beamer
 - Compiling &#x27F3;
 - Error: unexpected &#125; in line 342
 - Let me spend 6 hours moving this image 2 pixels left
-\end
-\end
+\endend
 
 ## Tables
 
