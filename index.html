@@ -5,1067 +5,354 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>HTML Slides Demo</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-  <script src="https://cdn.jsdelivr.net/npm/marked@4.3.0/marked.min.js"></script>
+  
+  <!-- KaTeX CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css" integrity="sha384-GvrOXuhMATgEsSwCs4smul74iXGOixntILdUW9XmUC6+HX0sLNAK3q71HotJqlAn" crossorigin="anonymous">
+  
+  <!-- KaTeX JavaScript -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js" integrity="sha384-cpW21h6RZv/phavutF+AuVYrr+dA8xD9zs6FwLpaCct6O9ctzYFfFr4dgmgccOTx" crossorigin="anonymous"></script>
+  
+  <!-- KaTeX auto-render extension -->
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js" integrity="sha384-+VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4+/RRE05" crossorigin="anonymous"></script>
+  
   <script src="https://cdn.jsdelivr.net/gh/davidshimjs/qrcodejs/qrcode.min.js"></script>
-  <script type="text/x-mathjax-config">
-      MathJax.Hub.Config({
-          tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
-          TeX: { 
-            equationNumbers: { autoNumber: "AMS" },
-            Macros: {
-                ket: ["\\left| #1 \\right\\rangle", 1],
-                bra: ["\\left\\langle #1 \\right|", 1],
-                ip: ["\\left\\langle #1 \\middle| #2 \\right\\rangle", 2],
-                dyad: ["\\left| #1 \\right\\rangle \\! \\left\\langle #2 \\right|", 2],
-                q: "\\hat{q}",
-                p: "\\hat{p}",
-                a: "\\hat{a}",
-                n: "\\hat{n}",
-                sx: "\\sigma_x",
-                sy: "\\sigma_y",
-                sz: "\\sigma_z",
-                D: ["\\mathcal{D}\\left( #1 \\right)", 1],
-                S: ["\\mathcal{S}\\left( #1 \\right)", 1],
-                R: ["\\mathcal{R}\\left( #1 \\right)", 1],
-                tr: "\\text{Tr}",
-                dd: "\\mathrm{d}",
-            }
-        }
-      });
-  </script>
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap');
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Comic Neue', cursive;
-      color: #333;
-      background-color: #f8f9fa;
-      overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      -moz-user-select: none;
-      -ms-user-select: none;
-    }
-
-    .slides-container {
-      width: 100vw;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      transition: transform 0.6s ease-in-out;
-    }
-
-    .slide {
-      width: 100vw;
-      height: 100vh;
-      background: white;
-      border-radius: 0;
-      box-shadow: none;
-      box-sizing: border-box;
-      display: none;
-    }
-
-    .slide.active {
-      display: block;
-    }
-
-    .slide-header {
-      width: 100%;
-      background-color: transparent;
-      color: #3498db;
-      padding: 2rem 3rem;
-      box-sizing: border-box;
-    }
-
-    .slide-content {
-      width: 100%;
-      max-width: 100%;
-      height: calc(100% - 60px);
-      padding: 0 3rem;
-      box-sizing: border-box;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      touch-action: pan-y;
-    }
-
-    .slide-content p,
-    .slide-content ul,
-    .slide-content ol {
-      margin-bottom: 1.5rem;
-    }
-
-    .title-slide .slide-content {
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    h1 {
-      font-size: 4.5rem;
-      margin-bottom: 1.5rem;
-      color: #2c3e50;
-    }
-
-    h2 {
-      font-size: 3rem;
-      color: #3498db;
-      margin: 0;
-    }
-
-    h3 {
-      font-size: 2rem;
-      color: #2c3e50;
-      margin: 0;
-    }
-
-    .itemize {
-      margin: 0;
-      padding: 0;
-    }
-
-    .itemize li {
-      font-size: 1.8rem;
-      margin-bottom: 1.2rem;
-      padding-left: 2rem;
-      position: relative;
-    }
-
-    .itemize li:before {
-      color: #3498db;
-      font-weight: bold;
-      font-size: 2rem;
-      margin-right: 0.8rem;
-      position: absolute;
-      left: 0;
-      top: 0;
-      line-height: 1;
-    }
-
-    .itemize li ul li {
-      margin-top: 0.6rem;
-    }
-
-    ul {
-      list-style-type: none;
-      padding-left: 0;
-      margin: 0;
-    }
-
-    ul li {
-      font-size: 1.8rem;
-      margin-bottom: 1.2rem;
-      padding-left: 2rem;
-      position: relative;
-    }
-
-    ul li:before {
-      content: "•";
-      color: #3498db;
-      font-weight: bold;
-      font-size: 2rem;
-      position: absolute;
-      left: 0;
-      top: 0;
-      line-height: 1;
-    }
-
-    label {
-      font-size: 1.5rem;
-    }
-
-    .subtitle {
-      font-size: 2rem;
-      color: #3f5c5d;
-    }
-
-    .subsubtitle {
-      font-size: 1.5rem;
-      color: #3f5c5d;
-    }
-
-    p {
-      font-size: 2rem;
-      line-height: 1.6;
-      margin-bottom: 1.5rem;
-    }
-
-    .slide-number {
-      position: absolute;
-      right: 10px;
-      top: -36px;
-      color: #7f8c8d;
-      font-size: 1.2rem;
-      background-color: rgba(255, 255, 255, 0.7);
-      padding: 0.2rem 0.5rem;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .nav-arrow {
-      cursor: pointer;
-      font-size: 1.5rem;
-      color: #3498db;
-      transition: color 0.3s ease;
-    }
-
-    .nav-arrow:hover {
-      color: #2980b9;
-    }
-
-    .nav-arrow.disabled {
-      color: #bdc3c7;
-      cursor: not-allowed;
-    }
-
-    .nav-arrow.disabled:hover {
-      color: #bdc3c7;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 2rem 0;
-      font-size: 1.8rem;
-    }
-
-    th,
-    td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f2f2f2;
-      font-weight: bold;
-    }
-
-    tr:hover {
-      background-color: #f5f5f5;
-    }
-
-    .figure {
-      text-align: center;
-      margin-bottom: 1rem;
-    }
-
-    .figure-content {
-      display: inline-block;
-      transform-origin: center center;
-    }
-
-    .figure img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 4px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .figure-caption {
-      margin-top: 0.8rem;
-      font-style: italic;
-      color: #555;
-      font-size: 1.8rem;
-      text-align: center;
-      width: 100%;
-    }
-
-    code {
-      font-family: Monaco, Consolas, "Courier New", monospace;
-      background-color: #f5f5f5;
-      padding: 0.3rem 0.6rem;
-      border-radius: 3px;
-      font-size: 1.8rem;
-    }
-
-    .footnote {
-      font-size: 1.2rem;
-      margin-top: 1.5rem;
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      padding: 0 2rem;
-    }
-
-    .footnote-ref {
-      font-size: 0.9em;
-      text-decoration: none;
-    }
-    
-    .footnote-cite {
-      vertical-align: super;
-      font-size: 1.8rem;
-      color: #3498db;
-      text-decoration: none;
-    }
-
-    .animation-container {
-      width: 100%;
-      height: 300px;
-      background-color: #f0f0f0;
-      border-radius: 8px;
-      position: relative;
-      overflow: hidden;
-      margin-bottom: 2rem;
-    }
-
-    .animated-element {
-      width: 50px;
-      height: 50px;
-      background-color: #3498db;
-      border-radius: 50%;
-      position: absolute;
-      top: 125px;
-      left: 0;
-      transition: left 0.3s ease;
-    }
-
-    @keyframes moveRight {
-      from {
-        left: 0;
-      }
-
-      to {
-        left: calc(100% - 50px);
-      }
-    }
-
-    .slider-container {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .slider {
-      width: 80%;
-    }
-
-    .slider-value {
-      font-size: 1.8rem;
-      color: #555;
-    }
-
-    /* Unified column system */
-    .columns {
-      display: grid;
-      gap: 2rem;
-      width: 100%;
-      padding: 0;
-      grid-auto-flow: column;
-      grid-auto-columns: 1fr;
-    }
-
-    .columns[data-cols="2"] {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .columns[data-cols="3"] {
-      grid-template-columns: repeat(3, 1fr);
-    }
-
-    .columns[data-cols="4"] {
-      grid-template-columns: repeat(4, 1fr);
-    }
-
-    /* Weight-based columns */
-    .columns[data-weights] {
-      grid-template-columns: var(--col-weights);
-    }
-
-    .column {
-      background-color: #f5f7fa;
-      border-radius: 12px;
-      padding: 2rem;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    .column h3 {
-      color: #3498db;
-      margin-bottom: 1.5rem;
-      text-align: center;
-      font-size: 2.4rem;
-    }
-
-    .progress-container {
-      width: 100%;
-      height: 6px;
-      background-color: rgba(0, 0, 0, 0.1);
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      z-index: 1000;
-    }
-
-    .progress-bar {
-      height: 100%;
-      background-color: #3498db;
-      width: 0;
-      transition: width 0.3s ease;
-    }
-
-    .equation {
-      text-align: center;
-      font-size: 2.2rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .quote-container {
-      margin: 2rem 0;
-      padding: 1.5rem;
-      background-color: #f9f9f9;
-      border-left: 5px solid #3498db;
-      position: relative;
-    }
-
-    .quote-text {
-      font-size: 2rem;
-      font-style: italic;
-      margin-bottom: 0.8rem;
-    }
-
-    .quote-author {
-      font-size: 1.6rem;
-      text-align: right;
-      color: #7f8c8d;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-
-      to {
-        opacity: 1;
-      }
-    }
-
-    .fade-in {
-      animation: fadeIn 0.5s ease;
-    }
-
-    .compare-table {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1rem;
-      margin: 2rem 0;
-    }
-
-    .compare-item {
-      background-color: #f5f7fa;
-      border-radius: 8px;
-      padding: 1.5rem;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .compare-item h3 {
-      color: #3498db;
-      margin-top: 0;
-      font-size: 2.4rem;
-      text-align: center;
-    }
-
-    .compare-item.highlight {
-      background-color: #ebf5fb;
-      border: 2px solid #3498db;
-    }
-
-    body::before {
-      content: none;
-    }
-
-    .figure-row {
-      display: flex;
-      gap: 2rem;
-      justify-content: center;
-      align-items: center;
-      width: 100%;
-      flex-wrap: wrap;
-      margin-bottom: 2rem;
-    }
-
-    .figure {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      flex: 1;
-      min-width: 0;
-      max-width: 100%;
-      margin: 0 auto;
-    }
-
-    .figure img {
-      max-width: 100%;
-      height: auto;
-      border-radius: 4px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .figure-caption {
-      margin-top: 0.8rem;
-      font-style: italic;
-      color: #555;
-      font-size: 1.8rem;
-      text-align: center;
-      width: 100%;
-    }
-
-    .slides-container.zoomed {
-      transform-origin: 0 0;
-      transition: transform 0.1s ease;
-    }
-
-    .qr-box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-      text-align: center;
-      transition: transform 0.2s;
-      width: 100%;
-      max-width: 400px;
-      margin: 0 auto;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .qr-container {
-      width: 300px;
-      height: 300px;
-      margin: 10px auto;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-      background: white;
-      padding: 10px;
-      border-radius: 8px;
-    }
-
-    .qr-container img {
-      max-width: 100%;
-      height: auto;
-      display: block;
-    }
-
-    .qr-caption {
-      margin-top: 15px;
-      font-size: 18px;
-      font-weight: bold;
-      color: #333;
-      padding: 5px;
-      border-radius: 5px;
-    }
-
-    .qr-error {
-      color: #f44336;
-      font-size: 16px;
-      padding: 10px;
-      background-color: #ffebee;
-      border-radius: 5px;
-      margin: 10px 0;
-    }
-  </style>
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-<div class="slides-container" id="slides-container">
-  <!-- Content will be loaded here -->
-</div>
-<div class="progress-container">
-  <div class="progress-bar"></div>
-  <div class="slide-number">
-    <span class="nav-arrow" onclick="prevSlide()">&lt;</span>
-    <span id="slide-number-text">NaN</span>
-    <span class="nav-arrow" onclick="nextSlide()">&gt;</span>
+  <div class="slides-container" id="slides-container">
+    <!-- Content will be loaded here -->
   </div>
-</div>
+  <div class="progress-container">
+    <div class="progress-bar"></div>
+    <div class="slide-number">
+      <span class="nav-arrow" onclick="prevSlide()">&lt;</span>
+      <span id="slide-number-text">NaN</span>
+      <span class="nav-arrow" onclick="nextSlide()">&gt;</span>
+    </div>
+  </div>
 
-<script>
-  const renderer = new marked.Renderer();
-  renderer.heading = function(text, level) {
-    if (level === 1) {
-      document.title = text.trim();
-      return `<div class="slide title-slide">
-<div class="slide-content">
-<h1>${text}</h1>`;
-    }
-    if (level === 2) {
-      return `</div></div><div class="slide">
-${text ? `<div class="slide-header"><h2>${text}</h2></div>` : ''}
-<div class="slide-content">`;
-    }
-    return `<h${level}>${text}</h${level}>`;
-  };
-
-  marked.setOptions({
-    breaks: true,
-    gfm: true,
-    sanitize: false,
-    smartLists: true,
-    smartypants: true,
-    headerIds: false,
-    mangle: false,
-    pedantic: true
-  });
-
-  renderer.list = function(body, ordered) {
-    const type = ordered ? 'ol' : 'ul';
-    return `<${type} class="itemize">${body}</${type}>`;
-  };
-
-  renderer.listitem = function(text) {
-    return `<li>${text}</li>`;
-  };
-
-  renderer.link = function(href, title, text) {
-    return `<a href="${href}"${title ? ` title="${title}"` : ''}>${text}</a>`;
-  };
-
-  let slideIdx = 0;
-  let slides = [];
-  let slideNumber;
-  let progressBar;
-  let isZoomed = false;
-  const ZOOM_FACTOR = 2;
-
-  function resetZoom(e) {
-    if (e.key === '`'){
-      isZoomed = false;
-      const slidesContainer = document.getElementById('slides-container');
-      slidesContainer.classList.remove('zoomed');
-      // Get current transform origin and position
-      const currentOrigin = slidesContainer.style.transformOrigin;
-      const currentTransform = slidesContainer.style.transform;
-      
-      // Calculate the current position based on transform
-      const matrix = new DOMMatrix(currentTransform);
-      const currentX = matrix.m41;
-      const currentY = matrix.m42;
-      
-      // Set up the transition
-      slidesContainer.style.transition = 'transform 0.3s ease';
-      
-      // Reset to normal scale while maintaining position
-      slidesContainer.style.transform = `translate(${currentX}px, ${currentY}px) scale(1)`;
-      
-      // After transition completes, reset to default position
-      setTimeout(() => {
-        slidesContainer.style.transition = 'none';
-        slidesContainer.style.transform = 'none';
-        slidesContainer.style.transformOrigin = '0 0';
-      }, 300);
-    }
-  }
-
-  function handleZoom(e) {
-    if (e.key === '`' && !isZoomed) {
-      isZoomed = true;
-      const slidesContainer = document.getElementById('slides-container');
-      slidesContainer.classList.add('zoomed');
-      updateZoomPosition(e);
-    }
-  }
-
-  function updateZoomPosition(e) {
-    if (!isZoomed) return;
+  <script type="module">
+    import { katexMacros } from './katexMacros.js';
+    import MarkdownSlidesParser from './slidesParser.js';
+    window.MarkdownSlidesParser = MarkdownSlidesParser;
     
-    const slidesContainer = document.getElementById('slides-container');
-    const rect = slidesContainer.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    
-    const originX = (mouseX / rect.width) * 100;
-    const originY = (mouseY / rect.height) * 100;
-    
-    slidesContainer.style.transformOrigin = `${originX}% ${originY}%`;
-    slidesContainer.style.transform = `scale(${ZOOM_FACTOR})`;
-  }
+    class SlidesApp {
+      constructor() {
+        this.slideIdx = 0;
+        this.slides = [];
+        this.slideNumber = null;
+        this.progressBar = null;
+        this.isZoomed = false;
+        this.ZOOM_FACTOR = 2;
+        this.parser = new MarkdownSlidesParser();
+        this.katexMacros = katexMacros || {};
 
-  function updateSlide() {
-    slides.forEach(slide => slide.classList.remove('active'));
-    slides[slideIdx].classList.add('active');
-    const adjustedSlideNumber = slideIdx === 0 ? 0 : slideIdx;
-    slideNumber.textContent = `${adjustedSlideNumber} / ${slides.length - 1}`;
-    progressBar.style.width = `${(adjustedSlideNumber / (slides.length - 1)) * 100}%`;
-    const url = new URL(window.location.href);
-    url.searchParams.set('p', slideIdx);
-    window.history.replaceState({}, '', url.toString());
-
-    const prevArrow = document.querySelector('.nav-arrow:first-child');
-    const nextArrow = document.querySelector('.nav-arrow:last-child');
-    
-    if (slideIdx === 0) {
-      prevArrow.classList.add('disabled');
-    } else {
-      prevArrow.classList.remove('disabled');
-    }
-    
-    if (slideIdx === slides.length - 1) {
-      nextArrow.classList.add('disabled');
-    } else {
-      nextArrow.classList.remove('disabled');
-    }
-  }
-
-  function nextSlide() {
-    if (slideIdx < slides.length - 1) {
-      slideIdx++;
-      updateSlide();
-    }
-  }
-
-  function prevSlide() {
-    if (slideIdx > 0) {
-      slideIdx--;
-      updateSlide();
-    }
-  }
-
-  function initializeSlides() {
-    slides = document.querySelectorAll('.slide');
-    slideNumber = document.querySelector('#slide-number-text');
-    progressBar = document.querySelector('.progress-bar');
-    let citeIdx = 0;
-
-    document.querySelectorAll('.columns').forEach(columns => {
-      if (columns.hasAttribute('data-weights')) {
-        const weights = columns.getAttribute('data-weights').split(' ');
-        columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
-      } else {
-        const columnCount = columns.querySelectorAll('.column').length;
-        if (columnCount > 0) {
-          const weights = Array(columnCount).fill('1fr').join(' ');
-          columns.style.setProperty('--col-weights', weights);
-        }
+        this.init();
       }
-    });
 
-    slides.forEach(slide => {
-      slide.querySelectorAll('.equation').forEach(equation => {
-        const content = equation.textContent.trim();
-        if (!content.startsWith('$') && !content.endsWith('$')) {
-          equation.textContent = `$${content}$`;
-        }
-      });
+      async init() {
+        this.slideNumber = document.querySelector('#slide-number-text');
+        this.progressBar = document.querySelector('.progress-bar');
 
-      const footnoteCites = slide.querySelectorAll('.footnote-cite');
-      if (footnoteCites.length > 0) {
-        let footnoteContainer = slide.querySelector('.footnote');
-        if (!footnoteContainer) {
-          footnoteContainer = document.createElement('div');
-          footnoteContainer.className = 'footnote';
-          const footnoteParagraph = document.createElement('p');
-          footnoteContainer.appendChild(footnoteParagraph);
-          slide.querySelector('.slide-content').appendChild(footnoteContainer);
-        }
+        this.setupEventListeners();
+        this.loadContent();
+      }
 
-        const footnoteParagraph = footnoteContainer.querySelector('p');
-        footnoteCites.forEach((cite, index) => {
-          citeIdx++;
-          const footnoteText = `[${citeIdx}] ${cite.textContent.trim()}`;
-          cite.textContent = `[${citeIdx}]`;
-          if (index > 0) {
-            footnoteParagraph.appendChild(document.createTextNode(' '));
+      setupKatexRendering() {
+        // Configure KaTeX auto-render with loaded macros
+        const katexOptions = {
+          delimiters: [
+            {left: '$$', right: '$$', display: true},
+            {left: '$', right: '$', display: false},
+            {left: '\\(', right: '\\)', display: false},
+            {left: '\\[', right: '\\]', display: true}
+          ],
+          macros: this.katexMacros,
+          throwOnError: false,
+          errorColor: '#cc0000',
+          strict: false
+        };
+
+        // Render math in the slides container
+        renderMathInElement(document.getElementById('slides-container'), katexOptions);
+      }
+
+      setupEventListeners() {
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+            this.nextSlide();
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            this.prevSlide();
           }
-          footnoteParagraph.appendChild(document.createTextNode(footnoteText));
         });
+
+        // Zoom functionality
+        document.addEventListener('keydown', (e) => this.handleZoom(e));
+        document.addEventListener('keyup', (e) => this.resetZoom(e));
+        document.addEventListener('mousemove', (e) => this.updateZoomPosition(e));
+
+        // Wheel navigation
+        this.setupWheelNavigation();
+
+        // Touch navigation
+        this.setupTouchNavigation();
+
+        // Navigation buttons
+        window.nextSlide = () => this.nextSlide();
+        window.prevSlide = () => this.prevSlide();
       }
-    });
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') nextSlide();
-      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') prevSlide();
-    });
-    
-    document.addEventListener('keydown', handleZoom);
-    document.addEventListener('keyup', resetZoom);
-    document.addEventListener('mousemove', updateZoomPosition);
+      setupWheelNavigation() {
+        let wheelTimeout;
+        let accumulatedDelta = 0;
 
-    let wheelTimeout;
-    let accumulatedDelta = 0;
-
-    document.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      accumulatedDelta += e.deltaY;
-
-      clearTimeout(wheelTimeout);
-      wheelTimeout = setTimeout(() => {
-        const steps = Math.floor(Math.abs(accumulatedDelta) / 100);
-        const direction = accumulatedDelta > 0 ? 1 : -1;
-        for (let i = 0; i < steps; i++) {
-          if (direction > 0) {
-            nextSlide();
-          } else {
-            prevSlide();
-          }
-        }
-        if (slideIdx > 0 && slideIdx < slides.length - 1) {
-          slides[slideIdx].classList.add('fade-in');
-          setTimeout(() => {
-            slides[slideIdx].classList.remove('fade-in');
-          }, 1000);
-        }
-
-        accumulatedDelta = 0;
-      }, 50);
-    }, { passive: false });
-
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-    let initialTouchSlide = 0;
-    let initialTouchDistance = 0;
-
-    document.addEventListener('touchstart', (e) => {
-      if (e.touches.length === 2) {
-        touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-        initialTouchDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        initialTouchSlide = slideIdx;
-      }
-    }, { passive: true });
-
-    document.addEventListener('touchmove', (e) => {
-      if (e.touches.length === 2) {
-        touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-        touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-        const currentTouchDistance = Math.hypot(
-          e.touches[0].clientX - e.touches[1].clientX,
-          e.touches[0].clientY - e.touches[1].clientY
-        );
-        
-        if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
+        document.addEventListener('wheel', (e) => {
           e.preventDefault();
-          const deltaX = touchEndX - touchStartX;
-          const deltaY = touchEndY - touchStartY;
-          const screenWidth = window.innerWidth;
-          const totalSlides = slides.length - 1;
+          accumulatedDelta += e.deltaY;
 
-          if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
-            slideIdx = Math.max(0, Math.min(targetSlide, totalSlides));
-            updateSlide();
+          clearTimeout(wheelTimeout);
+          wheelTimeout = setTimeout(() => {
+            const steps = Math.floor(Math.abs(accumulatedDelta) / 100);
+            const direction = accumulatedDelta > 0 ? 1 : -1;
+
+            for (let i = 0; i < steps; i++) {
+              if (direction > 0) {
+                this.nextSlide();
+              } else {
+                this.prevSlide();
+              }
+            }
+
+            if (this.slideIdx > 0 && this.slideIdx < this.slides.length - 1) {
+              this.slides[this.slideIdx].classList.add('fade-in');
+              setTimeout(() => {
+                this.slides[this.slideIdx].classList.remove('fade-in');
+              }, 1000);
+            }
+
+            accumulatedDelta = 0;
+          }, 50);
+        }, { passive: false });
+      }
+
+      setupTouchNavigation() {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let touchEndX = 0;
+        let touchEndY = 0;
+        let initialTouchSlide = 0;
+        let initialTouchDistance = 0;
+
+        document.addEventListener('touchstart', (e) => {
+          if (e.touches.length === 2) {
+            touchStartX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            touchStartY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            initialTouchDistance = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+            initialTouchSlide = this.slideIdx;
           }
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+          if (e.touches.length === 2) {
+            touchEndX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+            touchEndY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+            const currentTouchDistance = Math.hypot(
+              e.touches[0].clientX - e.touches[1].clientX,
+              e.touches[0].clientY - e.touches[1].clientY
+            );
+
+            if (Math.abs(currentTouchDistance - initialTouchDistance) < 50) {
+              e.preventDefault();
+              const deltaX = touchEndX - touchStartX;
+              const deltaY = touchEndY - touchStartY;
+              const screenWidth = window.innerWidth;
+              const totalSlides = this.slides.length - 1;
+
+              if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                const targetSlide = initialTouchSlide + Math.floor((deltaX / screenWidth) * totalSlides);
+                this.slideIdx = Math.max(0, Math.min(targetSlide, totalSlides));
+                this.updateSlide();
+              }
+            }
+          }
+        }, { passive: false });
+      }
+
+      handleZoom(e) {
+        if (e.key === '`' && !this.isZoomed) {
+          this.isZoomed = true;
+          const slidesContainer = document.getElementById('slides-container');
+          slidesContainer.classList.add('zoomed');
+          this.updateZoomPosition(e);
         }
       }
-    }, { passive: false });
-  }
 
-  function initializeQRCodes() {
-    document.querySelectorAll('.qr-container').forEach(container => {
-      const message = container.getAttribute('data-message');
-      if (message) {
-        new QRCode(container, {
-          text: message.trim(),
-          width: 300,
-          height: 300,
-          colorDark: '#000000',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.H
-        });
+      resetZoom(e) {
+        if (e.key === '`') {
+          this.isZoomed = false;
+          const slidesContainer = document.getElementById('slides-container');
+          slidesContainer.classList.remove('zoomed');
+
+          const currentOrigin = slidesContainer.style.transformOrigin;
+          const currentTransform = slidesContainer.style.transform;
+
+          const matrix = new DOMMatrix(currentTransform);
+          const currentX = matrix.m41;
+          const currentY = matrix.m42;
+
+          slidesContainer.style.transition = 'transform 0.3s ease';
+          slidesContainer.style.transform = `translate(${currentX}px, ${currentY}px) scale(1)`;
+
+          setTimeout(() => {
+            slidesContainer.style.transition = 'none';
+            slidesContainer.style.transform = 'none';
+            slidesContainer.style.transformOrigin = '0 0';
+          }, 300);
+        }
       }
+
+      updateZoomPosition(e) {
+        if (!this.isZoomed) return;
+
+        const slidesContainer = document.getElementById('slides-container');
+        const rect = slidesContainer.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const originX = (mouseX / rect.width) * 100;
+        const originY = (mouseY / rect.height) * 100;
+
+        slidesContainer.style.transformOrigin = `${originX}% ${originY}%`;
+        slidesContainer.style.transform = `scale(${this.ZOOM_FACTOR})`;
+      }
+
+      updateSlide() {
+        this.slides.forEach(slide => slide.classList.remove('active'));
+        this.slides[this.slideIdx].classList.add('active');
+
+        const adjustedSlideNumber = this.slideIdx === 0 ? 0 : this.slideIdx;
+        this.slideNumber.textContent = `${adjustedSlideNumber} / ${this.slides.length - 1}`;
+        this.progressBar.style.width = `${(adjustedSlideNumber / (this.slides.length - 1)) * 100}%`;
+
+        const url = new URL(window.location.href);
+        url.searchParams.set('p', this.slideIdx);
+        window.history.replaceState({}, '', url.toString());
+
+        this.updateNavigationButtons();
+        
+        // Re-render math on slide change
+        this.setupKatexRendering();
+      }
+
+      updateNavigationButtons() {
+        const prevArrow = document.querySelector('.nav-arrow:first-child');
+        const nextArrow = document.querySelector('.nav-arrow:last-child');
+
+        if (this.slideIdx === 0) {
+          prevArrow.classList.add('disabled');
+        } else {
+          prevArrow.classList.remove('disabled');
+        }
+
+        if (this.slideIdx === this.slides.length - 1) {
+          nextArrow.classList.add('disabled');
+        } else {
+          nextArrow.classList.remove('disabled');
+        }
+      }
+
+      nextSlide() {
+        if (this.slideIdx < this.slides.length - 1) {
+          this.slideIdx++;
+          this.updateSlide();
+        }
+      }
+
+      prevSlide() {
+        if (this.slideIdx > 0) {
+          this.slideIdx--;
+          this.updateSlide();
+        }
+      }
+
+      async loadContent() {
+        try {
+          const text = await fetch('./main.md').then(res => res.text());
+
+          // Parse markdown into slides
+          this.parser.parseMarkdown(text);
+
+          // Render slides to container
+          const slidesContainer = document.getElementById('slides-container');
+          this.slides = Array.from(this.parser.renderToContainer(slidesContainer));
+
+          // Handle URL parameters for slide navigation
+          const urlParams = new URLSearchParams(window.location.search);
+          const slideParam = urlParams.get('p');
+          if (slideParam) {
+            const parsedSlide = parseInt(slideParam) || 0;
+            this.slideIdx = Math.max(0, Math.min(parsedSlide, this.slides.length - 1));
+          }
+
+          this.updateSlide();
+          this.updateCurrentDate();
+
+          // Initial KaTeX rendering
+          this.setupKatexRendering();
+        } catch (error) {
+          console.error('Error loading content:', error);
+        }
+      }
+
+      updateCurrentDate() {
+        const dateElement = document.getElementById('current-date');
+        if (dateElement) {
+          const currentDate = new Date();
+          const formattedDate = currentDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+          });
+          dateElement.textContent = `${formattedDate}`;
+        }
+      }
+
+      // Public API methods
+      goToSlide(index) {
+        if (index >= 0 && index < this.slides.length) {
+          this.slideIdx = index;
+          this.updateSlide();
+        }
+      }
+
+      getCurrentSlide() {
+        return this.slideIdx;
+      }
+
+      getTotalSlides() {
+        return this.slides.length;
+      }
+    }
+
+    // Wait for KaTeX to load before initializing the app
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check if KaTeX and auto-render are loaded
+      const checkKatexLoaded = () => {
+        if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
+          window.slidesApp = new SlidesApp();
+        } else {
+          setTimeout(checkKatexLoaded, 100);
+        }
+      };
+      checkKatexLoaded();
     });
-  }
-
-  async function loadContent() {
-    try {
-      const text = await fetch('./main.md').then(res => res.text());
-      
-      // Preprocess the markdown content
-      const preprocessedText = text
-        // Handle \quote{text}{author}
-        .replace(/\\quote\{([^}]*)\}\{([^}]*)\}/g, (match, text, author) => {
-          return `<div class="quote-container"><p class="quote-text">${text}</p><p class="quote-author">- ${author}</p></div>`;
-        })
-        // Handle \compares* and \compares
-        .replace(/\\compares(\*?)/g, (match, isHighlight) => {
-          return `<div class="compare-table"><div class="compare-item ${isHighlight ? 'highlight' : ''}">`;
-        })
-        // Handle \compare* and \compare
-        .replace(/\\compare(\*?)/g, (match, isHighlight) => {
-          return `</div><div class="compare-item ${isHighlight ? 'highlight' : ''}">`;
-        })
-        // Handle \centertitle{...}
-        .replace(/\\centertitle\{([^}]*)\}/g, (match, content) => {
-          return `<h1 style="font-size: 6rem; color: #3498db; text-align: center;">${content}</h1>`;
-        })
-        // Handle \subtitle{...}
-        .replace(/\\subtitle\{([^}]*)\}/g, (match, content) => {
-          content = content.replace(/\\\\/g, '<br>');
-          return `<p class="subtitle">${content}</p>`;
-        })
-        // Handle \subsubtitle{...}
-        .replace(/\\subsubtitle\{([^}]*)\}/g, (match, content) => {
-          content = content.replace(/\\\\/g, '<br>');
-          return `<p class="subsubtitle">${content}</p>`;
-        })
-        // Handle \today
-        .replace(/\\today/g, () => {
-          return `<p id="current-date" style="font-size: 2rem;"></p>`;
-        })
-        // Handle \columns[optional weights]
-        .replace(/\\columns(?:\[([^\]]*)\])?/g, (match, weights) => {
-          return weights ? 
-            `<div class="columns" data-weights="${weights}"><div class="column">` : 
-            `<div class="columns"><div class="column">`;
-        })
-        // Handle \column
-        .replace(/\\column/g, () => {
-          return `</div><div class="column">`;
-        })
-        // Handle \endend
-        .replace(/\\endend/g, () => {
-          return `</div></div>`;
-        })
-        // Handle existing commands
-        .replace(/\\row\s*{((?:[^{}]|{[^{}]*})*)}/g, (match, content) => {
-          return `<div class="figure-row">${content}</div>`;
-        })
-        .replace(/\\figure\[([^\]]*)\]\{([^}]*)\}\{([^}]*)\}/g, (match, ratio, src, caption) => {
-          return `<div class="figure"><img src="${src}" alt="${caption}" style="width: ${ratio * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
-        })
-        .replace(/\\qrcode\{([^}]*)\}\{([^}]*)\}/g, (match, message, caption) => {
-          try {
-            const qrId = 'qr-' + Math.random().toString(36).substr(2, 9);
-            return `<div class="figure"><div class="qr-box"><div class="qr-container" id="${qrId}" data-message="${message}"></div><div class="figure-caption">${caption}</div></div></div>`;
-          } catch (error) {
-            console.error('Error generating QR code:', error);
-            return `<div class="figure"><div class="qr-box"><div class="qr-error">Error generating QR code</div><div class="figure-caption">${caption}</div></div></div>`;
-          }
-        });
-      
-      const html = marked.parse(preprocessedText, { 
-        renderer,
-        headerIds: false,
-        mangle: false,
-        pedantic: true
-      });
-      
-      const tempContainer = document.createElement('div');
-      tempContainer.innerHTML = html;
-      
-      function processDivContent(element) {
-        const children = Array.from(element.childNodes);
-        children.forEach(child => {
-          if (child.nodeType === Node.TEXT_NODE && child.textContent.trim()) {
-            if (child.parentNode.tagName === 'DIV') {
-              const parsed = marked.parse(child.textContent, {
-                renderer,
-                headerIds: false,
-                mangle: false,
-                pedantic: true
-              });
-              const tempDiv = document.createElement('div');
-              tempDiv.innerHTML = parsed;
-              child.parentNode.replaceChild(tempDiv, child);
-            }
-          } else if (child.nodeType === Node.ELEMENT_NODE) {
-            if (child.tagName === 'DIV') {
-              processDivContent(child);
-            }
-          }
-        });
-      }
-      
-      const slidesContainer = document.getElementById('slides-container');
-      slidesContainer.innerHTML = '';
-      
-      let currentSlide = null;
-      let currentContent = '';
-      
-      const nodes = Array.from(tempContainer.childNodes);
-      
-      nodes.forEach((node, index) => {
-        if (node.nodeType === Node.ELEMENT_NODE) {
-          if (node.tagName === 'DIV' && node.className === 'slide title-slide') {
-            if (currentSlide) {
-              currentSlide.innerHTML += currentContent + '</div></div>';
-              slidesContainer.appendChild(currentSlide);
-              currentContent = '';
-            }
-            currentSlide = node.cloneNode(true);
-            processDivContent(currentSlide);
-          } else if (node.tagName === 'DIV' && node.className === 'slide') {
-            if (currentSlide) {
-              currentSlide.innerHTML += currentContent + '</div></div>';
-              slidesContainer.appendChild(currentSlide);
-              currentContent = '';
-            }
-            currentSlide = node.cloneNode(true);
-            processDivContent(currentSlide);
-          } else {
-            currentContent += node.outerHTML;
-          }
-        }
-      });
-      
-      if (currentSlide) {
-        currentSlide.innerHTML += currentContent + '</div></div>';
-        slidesContainer.appendChild(currentSlide);
-      }
-
-      const scripts = slidesContainer.getElementsByTagName('script');
-      for (let script of scripts) {
-        const newScript = document.createElement('script');
-        newScript.textContent = script.textContent;
-        script.parentNode.replaceChild(newScript, script);
-      }
-      
-      initializeSlides();
-      initializeQRCodes();
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const slideParam = urlParams.get('p');
-      if (slideParam) {
-        const parsedSlide = parseInt(slideParam) || 0;
-        slideIdx = Math.max(0, Math.min(parsedSlide, slides.length - 1));
-      }
-      updateSlide();
-
-      // Force MathJax to reprocess the content after slides are loaded
-      if (window.MathJax && window.MathJax.Hub) {
-        window.MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
-      }
-    } catch (error) {
-      console.error('Error loading content:', error);
-    }
-
-    // Add a script to update the current date
-    const dateElement = document.getElementById('current-date');
-    if (dateElement) {
-      const currentDate = new Date();
-      const formattedDate = currentDate.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
-      });
-      dateElement.textContent = `${formattedDate}`;
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', loadContent);
-</script>
+  </script>
 </body>
 
 </html>

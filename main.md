@@ -2,7 +2,6 @@
 
 \subtitle{Xi Lu}
 \subsubtitle{School of Mathematical Science, Zhejiang University\\Department of Electrical and Computer Engineering, NC State University}
-
 \today
 
 ## Texts
@@ -24,20 +23,20 @@
 - Easily fetch online resources
 - Easy last-minute changes when presenting on different devices
 
-\endend
+\endcolumns
 
-\quote{This is a funny quote.}{Me}
+\quote{This is a quote.}{Me}
 
 ## Figures
 
-\row{
+\beginrow
 \figure[0.45]{https://placehold.co/800x300/e0e0e0/666666/png?text=Figure+1}{Figure 1}
-}
+\endrow
 
-\row{
+\beginrow
 \figure[0.45]{https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+2}{Figure 2}
 \figure[0.45]{https://placehold.co/380x240/e0e0e0/666666/png?text=Figure+3}{Figure 3}
-}
+\endrow
 
 ## Equations
 
@@ -69,7 +68,7 @@ $$
 I = \frac{1}{\pi} \int \dyad{\alpha}{\alpha} \dd^2{\alpha}
 $$
 
-\endend
+\endcolumns
 
 Inline equation:
 $
@@ -93,7 +92,7 @@ $.
 - Compiling &#x27F3;
 - Error: unexpected &#125; in line 342
 - Let me spend 6 hours moving this image 2 pixels left
-\endend
+\endcompares
 
 ## Tables
 
@@ -150,7 +149,7 @@ $.
 
 \centertitle{Thank you!}
 
-\row{
+\beginrow
 \qrcode{https://github.com/helloluxi/html-slides}{Github repo}
 \qrcode{https://helloluxi.github.io/html-slides}{Github page}
-}
+\endrow
