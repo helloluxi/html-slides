@@ -48,6 +48,7 @@
         this.ZOOM_FACTOR = 2;
         this.parser = new MarkdownSlidesParser();
         this.katexMacros = katexMacros || {};
+        this.isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '';
 
         this.init();
       }
@@ -346,6 +347,39 @@
       const checkKatexLoaded = () => {
         if (typeof katex !== 'undefined' && typeof renderMathInElement !== 'undefined') {
           window.slidesApp = new SlidesApp();
+          if (window.slidesApp.isLocalHost) {
+            document.addEventListener('dblclick', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Find the closest element with a line attribute
+                let element = event.target;
+                let lineNumber = null;
+                
+                while (element && element !== document.body) {
+                    if (element.hasAttribute('line')) {
+                        lineNumber = element.getAttribute('line');
+                        break;
+                  }
+                  element = element.parentElement;
+              }
+              
+              if (lineNumber) {
+                  try {
+                      // Post line number to localhost:4999
+                      await fetch('http://localhost:4999', {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'text/plain',
+                          },
+                          body: lineNumber
+                      });
+                  } catch (error) {
+                      console.error('Failed to post line number to localhost:4999:', error);
+                  }
+              }
+          });
+          }
         } else {
           setTimeout(checkKatexLoaded, 100);
         }

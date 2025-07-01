@@ -4,6 +4,7 @@ export class MarkdownSlidesParser {
         this.currentSlide = null;
         this.currentContent = '';
         this.citeIdx = 0;
+        this.startLineNumber = 1; // Member variable for line tracking
     }
 
     parseMarkdown(text) {
@@ -12,51 +13,66 @@ export class MarkdownSlidesParser {
         this.currentSlide = null;
         this.currentContent = '';
         this.citeIdx = 0;
+        this.startLineNumber = 1;
         
-        text = this.preprocessText(text);
-        const paras = text.split(/\r?\n(\r?\n)+/);
+        // Split paragraphs while tracking line numbers
+        const lines = text.split(/\r?\n/);
+        const paras = [];
+        let currentPara = [];
+        let paraStartLine = 1;
+        
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+            if (line.trim() === '') {
+                if (currentPara.length > 0) {
+                    paras.push({
+                        content: currentPara.join('\n'),
+                        startLine: paraStartLine
+                    });
+                    currentPara = [];
+                }
+                // Skip empty lines and update start line for next paragraph
+                while (i + 1 < lines.length && lines[i + 1].trim() === '') {
+                    i++;
+                }
+                paraStartLine = i + 2; // +2 because we're 0-indexed and next line
+            } else {
+                if (currentPara.length === 0) {
+                    paraStartLine = i + 1; // +1 because we're 0-indexed
+                }
+                currentPara.push(line);
+            }
+        }
+        
+        // Add final paragraph if exists
+        if (currentPara.length > 0) {
+            paras.push({
+                content: currentPara.join('\n'),
+                startLine: paraStartLine
+            });
+        }
+        
         for (let para of paras) {
-            this.processParagraph(para);
+            this.startLineNumber = para.startLine;
+            this.processParagraph(para.content);
         }
         this.closeCurrentSlide();
         return this.slides;
     }
 
-    preprocessText(text) {
+    postprocessText(text) {
         return text
-            // Handle \quote{text}{author}
-            .replace(/\\quote\{([^}]*)\}\{([^}]*)\}/g, (match, text, author) => {
-                return `<div class="quote-container"><p class="quote-text">${text}</p><p class="quote-author">- ${author}</p></div>`;
+            // Handle \url{...}
+            .replace(/\\url\{([^}]*)\}/g, (match, url) => {
+                return `<a href="${url}" target="_blank">${url}</a>`;
             })
-            // Handle \centertitle{...}
-            .replace(/\\centertitle\{([^}]*)\}/g, (match, content) => {
-                return `<h1 style="font-size: 6rem; color: #3498db; text-align: center;">${content}</h1>`;
+            // Handle \strong{...}
+            .replace(/\\strong\{([^}]*)\}/g, (match, content) => {
+                return `<strong>${content}</strong>`;
             })
-            // Handle \subtitle{...}
-            .replace(/\\subtitle\{([^}]*)\}/g, (match, content) => {
-                content = content.replace(/\\\\/g, '<br>');
-                return `<p class="subtitle">${content}</p>`;
-            })
-            // Handle \subsubtitle{...}
-            .replace(/\\subsubtitle\{([^}]*)\}/g, (match, content) => {
-                content = content.replace(/\\\\/g, '<br>');
-                return `<p class="subsubtitle">${content}</p>`;
-            })
-            // Handle \today
-            .replace(/\\today/g, () => {
-                return `<p id="current-date" style="font-size: 2rem;"></p>`;
-            })
-            .replace(/\\figure\[([^\]]*)\]\{([^}]*)\}\{([^}]*)\}/g, (match, ratio, src, caption) => {
-                return `<div class="figure"><img src="${src}" alt="${caption}" style="width: ${ratio * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
-            })
-            .replace(/\\qrcode\{([^}]*)\}\{([^}]*)\}/g, (match, message, caption) => {
-                try {
-                    const qrId = 'qr-' + Math.random().toString(36).substr(2, 9);
-                    return `<div class="figure"><div class="qr-box"><div class="qr-container" id="${qrId}" data-message="${message}"></div><div class="figure-caption">${caption}</div></div></div>`;
-                } catch (error) {
-                    console.error('Error generating QR code:', error);
-                    return `<div class="figure"><div class="qr-box"><div class="qr-error">Error generating QR code</div><div class="figure-caption">${caption}</div></div></div>`;
-                }
+            // Handle \emph{...}
+            .replace(/\\emph\{([^}]*)\}/g, (match, content) => {
+                return `<em>${content}</em>`;
             });
     }
 
@@ -65,6 +81,7 @@ export class MarkdownSlidesParser {
         let cachedLines = [];
         let codeBlockOpen = false;
         let codeLanguage = '';
+        let currentLineNumber = this.startLineNumber;
 
         const closeList = () => {
             if (lastListLevel >= 0) {
@@ -78,59 +95,131 @@ export class MarkdownSlidesParser {
         const renderCachedLines = () => {
             const joinedLines = cachedLines.join(' ').trim();
             if (joinedLines.startsWith('<') && joinedLines.endsWith('>')) {
-                // Treat as raw HTML
-                this.currentContent += joinedLines;
+                // Raw HTML block - wrap in div with line number
+                this.currentContent += `<div line="${currentLineNumber}">${joinedLines}</div>`;
             } else if (joinedLines.length > 0) {
-                this.currentContent += `<p>${joinedLines}</p>`;
+                // Plain text paragraph - apply postprocessing and use one line number
+                const processedText = this.postprocessText(joinedLines);
+                this.currentContent += `<p line="${currentLineNumber}">${processedText}</p>`;
             }
             cachedLines = [];
         };
         
-        for (let line of para.split(/\r?\n/)) {
+        const lines = para.split(/\r?\n/);
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
             let trimmedLine = line.trim();
+            const lineNumber = currentLineNumber + i;
             
             // Handle headings (slide creation)
             if (line.startsWith('# ')) {
                 renderCachedLines();
                 closeList();
                 this.closeCurrentSlide();
-                this.createTitleSlide(line.substring(2).trim());
+                this.createTitleSlide(line.substring(2).trim(), lineNumber);
                 continue;
             } else if (line.startsWith('## ')) {
                 renderCachedLines();
                 closeList();
                 this.closeCurrentSlide();
-                this.createSlide(line.substring(3).trim());
+                this.createSlide(line.substring(3).trim(), lineNumber);
                 continue;
             } else if (line.startsWith('### ')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<h3>${line.substring(4).trim()}</h3>`;
+                this.currentContent += `<h3 line="${lineNumber}">${line.substring(4).trim()}</h3>`;
                 continue;
             } else if (line.startsWith('#### ')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<h4>${line.substring(5).trim()}</h4>`;
+                this.currentContent += `<h4 line="${lineNumber}">${line.substring(5).trim()}</h4>`;
+                continue;
+            } 
+            // Move preprocessText functions here with line.startsWith checks
+            else if (trimmedLine.startsWith('\\quote{')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\quote\{([^}]*)\}\{([^}]*)\}/);
+                if (match) {
+                    const [, text, author] = match;
+                    this.currentContent += `<div class="quote-container" line="${lineNumber}"><p class="quote-text">${text}</p><p class="quote-author">- ${author}</p></div>`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\centertitle{')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\centertitle\{([^}]*)\}/);
+                if (match) {
+                    const content = match[1];
+                    this.currentContent += `<h1 style="font-size: 6rem; color: #3498db; text-align: center;" line="${lineNumber}">${content}</h1>`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\subtitle{')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\subtitle\{([^}]*)\}/);
+                if (match) {
+                    let content = match[1].replace(/\\\\/g, '<br>');
+                    this.currentContent += `<p class="subtitle" line="${lineNumber}">${content}</p>`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\subsubtitle{')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\subsubtitle\{([^}]*)\}/);
+                if (match) {
+                    let content = match[1].replace(/\\\\/g, '<br>');
+                    this.currentContent += `<p class="subsubtitle" line="${lineNumber}">${content}</p>`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\today')) {
+                renderCachedLines();
+                closeList();
+                this.currentContent += `<p id="current-date" style="font-size: 2rem;" line="${lineNumber}"></p>`;
+                continue;
+            } else if (trimmedLine.startsWith('\\figure[')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\figure\[([^\]]*)\]\{([^}]*)\}\{([^}]*)\}/);
+                if (match) {
+                    const [, ratio, src, caption] = match;
+                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratio * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\qrcode{')) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/\\qrcode\{([^}]*)\}\{([^}]*)\}/);
+                if (match) {
+                    const [, message, caption] = match;
+                    try {
+                        const qrId = 'qr-' + Math.random().toString(36).substr(2, 9);
+                        this.currentContent += `<div class="figure" line="${lineNumber}"><div class="qr-box"><div class="qr-container" id="${qrId}" data-message="${message}"></div><div class="figure-caption">${caption}</div></div></div>`;
+                    } catch (error) {
+                        console.error('Error generating QR code:', error);
+                        this.currentContent += `<div class="figure" line="${lineNumber}"><div class="qr-box"><div class="qr-error">Error generating QR code</div><div class="figure-caption">${caption}</div></div></div>`;
+                    }
+                }
                 continue;
             } else if (trimmedLine.startsWith('\\compares*')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<div class="compare-table"><div class="compare-item highlight">`;
+                this.currentContent += `<div class="compare-table" line="${lineNumber}"><div class="compare-item highlight">`;
                 continue;
             } else if (trimmedLine.startsWith('\\compares')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<div class="compare-table"><div class="compare-item">`;
+                this.currentContent += `<div class="compare-table" line="${lineNumber}"><div class="compare-item">`;
                 continue;
             } else if (trimmedLine.startsWith('\\compare*')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `</div><div class="compare-item highlight">`;
+                this.currentContent += `</div><div class="compare-item highlight" line="${lineNumber}">`;
                 continue;
             } else if (trimmedLine.startsWith('\\compare')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `</div><div class="compare-item">`;
+                this.currentContent += `</div><div class="compare-item" line="${lineNumber}">`;
                 continue;
             } else if (trimmedLine.match(/^\\columns(?:\[([^\]]*)\])?/)) {
                 renderCachedLines();
@@ -138,20 +227,20 @@ export class MarkdownSlidesParser {
                 const match = trimmedLine.match(/^\\columns(?:\[([^\]]*)\])?/);
                 const weights = match[1];
                 if (weights) {
-                    this.currentContent += `<div class="columns" data-weights="${weights}"><div class="column">`;
+                    this.currentContent += `<div class="columns" data-weights="${weights}" line="${lineNumber}"><div class="column">`;
                 } else {
-                    this.currentContent += `<div class="columns"><div class="column">`;
+                    this.currentContent += `<div class="columns" line="${lineNumber}"><div class="column">`;
                 }
                 continue;
             } else if (trimmedLine.startsWith('\\column')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `</div><div class="column">`;
+                this.currentContent += `</div><div class="column" line="${lineNumber}">`;
                 continue;
             } else if (trimmedLine.startsWith('\\beginrow')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<div class="figure-row">`;
+                this.currentContent += `<div class="figure-row" line="${lineNumber}">`;
                 continue;
             } else if (trimmedLine.startsWith('\\endrow')) {
                 renderCachedLines();
@@ -178,11 +267,11 @@ export class MarkdownSlidesParser {
                 
                 if (thisListLevel > lastListLevel) {
                     for (let i = 0; i < thisListLevel - lastListLevel; i++) {
-                        this.currentContent += `<ul class="itemize">`;
+                        this.currentContent += `<ul class="itemize" line="${lineNumber}">`;
                     }
                 }
                 
-                this.currentContent += `<li>${trimmedLine.substring(2)}</li>`;
+                this.currentContent += `<li line="${lineNumber}">${this.postprocessText(trimmedLine.substring(2))}</li>`;
                 lastListLevel = thisListLevel;
                 continue;
             }
@@ -198,7 +287,7 @@ export class MarkdownSlidesParser {
                     codeLanguage = '';
                 } else {
                     codeLanguage = trimmedLine.substring(3).trim();
-                    this.currentContent += '<pre>';
+                    this.currentContent += `<pre line="${lineNumber}">`;
                     if (codeLanguage) {
                         this.currentContent += `<div class="markdown-code-lang">${codeLanguage}</div>`;
                     }
@@ -216,6 +305,9 @@ export class MarkdownSlidesParser {
             
             // Cache regular lines
             if (trimmedLine.length > 0) {
+                if (cachedLines.length === 0) {
+                    currentLineNumber = lineNumber; // Track line number for cached content
+                }
                 cachedLines.push(line);
             }
         }
@@ -233,7 +325,7 @@ export class MarkdownSlidesParser {
             .replace(/'/g, '&#39;');
     }
 
-    createTitleSlide(title) {
+    createTitleSlide(title, lineNumber) {
         if (typeof document !== 'undefined') {
             document.title = title.trim();
         }
@@ -242,17 +334,19 @@ export class MarkdownSlidesParser {
             type: 'title',
             className: 'slide title-slide',
             title: title,
-            content: ''
+            content: '',
+            lineNumber: lineNumber
         };
         this.currentContent = '';
     }
 
-    createSlide(title = '') {
+    createSlide(title = '', lineNumber) {
         this.currentSlide = {
             type: 'regular',
             className: 'slide',
             title: title,
-            content: ''
+            content: '',
+            lineNumber: lineNumber
         };
         this.currentContent = '';
     }
@@ -266,48 +360,25 @@ export class MarkdownSlidesParser {
         }
     }
 
-    initializeQRCodes(container) {
-        if (typeof QRCode === 'undefined') {
-            console.warn('QRCode library not loaded');
-            return;
-        }
-
-        container.querySelectorAll('.qr-container').forEach(qrContainer => {
-            const message = qrContainer.getAttribute('data-message');
-            if (message && !qrContainer.querySelector('canvas, img')) {
-                try {
-                    new QRCode(qrContainer, {
-                        text: message.trim(),
-                        width: 300,
-                        height: 300,
-                        colorDark: '#000000',
-                        colorLight: '#ffffff',
-                        correctLevel: QRCode.CorrectLevel.H
-                    });
-                } catch (error) {
-                    console.error('Error generating QR code:', error);
-                    qrContainer.innerHTML = '<div class="qr-error">Error generating QR code</div>';
-                }
-            }
-        });
-    }
-
-    renderToContainer(container) {
+    renderToContainer(container, isLocalhost = false) {
         container.innerHTML = '';
         
         this.slides.forEach(slide => {
             const slideElement = document.createElement('div');
             slideElement.className = slide.className;
+            if (slide.lineNumber) {
+                slideElement.setAttribute('line', slide.lineNumber);
+            }
             
             if (slide.type === 'title') {
                 slideElement.innerHTML = `
                     <div class="slide-content">
-                        <h1>${slide.title}</h1>
+                        <h1 line="${slide.lineNumber || ''}">${slide.title}</h1>
                         ${slide.content}
                     </div>
                 `;
             } else {
-                const headerHtml = slide.title ? `<div class="slide-header"><h2>${slide.title}</h2></div>` : '';
+                const headerHtml = slide.title ? `<div class="slide-header"><h2 line="${slide.lineNumber || ''}">${slide.title}</h2></div>` : '';
                 slideElement.innerHTML = `
                     ${headerHtml}
                     <div class="slide-content">
@@ -325,104 +396,130 @@ export class MarkdownSlidesParser {
         return container.querySelectorAll('.slide');
     }
 
-    processAllSlideSpecialElements(container) {
-        // Process equations
-        container.querySelectorAll('.equation').forEach(equation => {
-            const content = equation.textContent.trim();
-            if (!content.startsWith('$') && !content.endsWith('$')) {
-                equation.textContent = `$${content}$`;
-            }
-        });
+   initializeQRCodes(container) {
+       if (typeof QRCode === 'undefined') {
+           console.warn('QRCode library not loaded');
+           return;
+       }
 
-        // Process footnotes for each slide
-        container.querySelectorAll('.slide').forEach(slide => {
-            this.processSlideFootnotes(slide);
-        });
+       container.querySelectorAll('.qr-container').forEach(qrContainer => {
+           const message = qrContainer.getAttribute('data-message');
+           if (message && !qrContainer.querySelector('canvas, img')) {
+               try {
+                   new QRCode(qrContainer, {
+                       text: message.trim(),
+                       width: 300,
+                       height: 300,
+                       colorDark: '#000000',
+                       colorLight: '#ffffff',
+                       correctLevel: QRCode.CorrectLevel.H
+                   });
+               } catch (error) {
+                   console.error('Error generating QR code:', error);
+                   qrContainer.innerHTML = '<div class="qr-error">Error generating QR code</div>';
+               }
+           }
+       });
+   }
 
-        // Setup copy buttons
-        this.setupCopyButtons(container);
+   processAllSlideSpecialElements(container) {
+       // Process equations
+       container.querySelectorAll('.equation').forEach(equation => {
+           const content = equation.textContent.trim();
+           if (!content.startsWith('$') && !content.endsWith('$')) {
+               equation.textContent = `$${content}$`;
+           }
+       });
 
-        // Initialize QR codes
-        this.initializeQRCodes(container);
+       // Process footnotes for each slide
+       container.querySelectorAll('.slide').forEach(slide => {
+           this.processSlideFootnotes(slide);
+       });
 
-        // Setup columns
-        this.setupColumns(container);
-    }
+       // Setup copy buttons
+       this.setupCopyButtons(container);
 
-    processSlideFootnotes(slide) {
-        const footnoteCites = slide.querySelectorAll('.footnote-cite');
-        if (footnoteCites.length > 0) {
-            let footnoteContainer = slide.querySelector('.footnote');
-            if (!footnoteContainer) {
-                footnoteContainer = document.createElement('div');
-                footnoteContainer.className = 'footnote';
-                const footnoteParagraph = document.createElement('p');
-                footnoteContainer.appendChild(footnoteParagraph);
-                slide.querySelector('.slide-content').appendChild(footnoteContainer);
-            }
+       // Initialize QR codes
+       this.initializeQRCodes(container);
 
-            const footnoteParagraph = footnoteContainer.querySelector('p');
-            footnoteCites.forEach((cite, index) => {
-                this.citeIdx++;
-                const footnoteText = `[${this.citeIdx}] ${cite.textContent.trim()}`;
-                cite.textContent = `[${this.citeIdx}]`;
-                if (index > 0) {
-                    footnoteParagraph.appendChild(document.createTextNode(' '));
-                }
-                footnoteParagraph.appendChild(document.createTextNode(footnoteText));
-            });
-        }
-    }
+       // Setup columns
+       this.setupColumns(container);
+   }
 
-    setupCopyButtons(container) {
-        container.querySelectorAll('.copy-button').forEach(button => {
-            button.addEventListener('click', async () => {
-                const codeBlock = button.previousElementSibling;
-                const code = codeBlock.textContent;
-                
-                try {
-                    await navigator.clipboard.writeText(code);
-                    button.textContent = 'Copied!';
-                    button.classList.add('copied');
-                    
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                        button.classList.remove('copied');
-                    }, 2000);
-                } catch (err) {
-                    console.error('Failed to copy code:', err);
-                    button.textContent = 'Error!';
-                    
-                    setTimeout(() => {
-                        button.textContent = 'Copy';
-                    }, 2000);
-                }
-            });
-        });
-    }
+   processSlideFootnotes(slide) {
+       const footnoteCites = slide.querySelectorAll('.footnote-cite');
+       if (footnoteCites.length > 0) {
+           let footnoteContainer = slide.querySelector('.footnote');
+           if (!footnoteContainer) {
+               footnoteContainer = document.createElement('div');
+               footnoteContainer.className = 'footnote';
+               const footnoteParagraph = document.createElement('p');
+               footnoteContainer.appendChild(footnoteParagraph);
+               slide.querySelector('.slide-content').appendChild(footnoteContainer);
+           }
 
-    setupColumns(container) {
-        container.querySelectorAll('.columns').forEach(columns => {
-            if (columns.hasAttribute('data-weights')) {
-                const weights = columns.getAttribute('data-weights').split(' ');
-                columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
-            } else {
-                const columnCount = columns.querySelectorAll('.column').length;
-                if (columnCount > 0) {
-                    const weights = Array(columnCount).fill('1fr').join(' ');
-                    columns.style.setProperty('--col-weights', weights);
-                }
-            }
-        });
-    }
+           const footnoteParagraph = footnoteContainer.querySelector('p');
+           footnoteCites.forEach((cite, index) => {
+               this.citeIdx++;
+               const footnoteText = `[${this.citeIdx}] ${cite.textContent.trim()}`;
+               cite.textContent = `[${this.citeIdx}]`;
+               if (index > 0) {
+                   footnoteParagraph.appendChild(document.createTextNode(' '));
+               }
+               footnoteParagraph.appendChild(document.createTextNode(footnoteText));
+           });
+       }
+   }
 
-    getSlideCount() {
-        return this.slides.length;
-    }
+   setupCopyButtons(container) {
+       container.querySelectorAll('.copy-button').forEach(button => {
+           button.addEventListener('click', async () => {
+               const codeBlock = button.previousElementSibling;
+               const code = codeBlock.textContent;
+               
+               try {
+                   await navigator.clipboard.writeText(code);
+                   button.textContent = 'Copied!';
+                   button.classList.add('copied');
+                   
+                   setTimeout(() => {
+                       button.textContent = 'Copy';
+                       button.classList.remove('copied');
+                   }, 2000);
+               } catch (err) {
+                   console.error('Failed to copy code:', err);
+                   button.textContent = 'Error!';
+                   
+                   setTimeout(() => {
+                       button.textContent = 'Copy';
+                   }, 2000);
+               }
+           });
+       });
+   }
 
-    getSlide(index) {
-        return this.slides[index] || null;
-    }
+   setupColumns(container) {
+       container.querySelectorAll('.columns').forEach(columns => {
+           if (columns.hasAttribute('data-weights')) {
+               const weights = columns.getAttribute('data-weights').split(' ');
+               columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
+           } else {
+               const columnCount = columns.querySelectorAll('.column').length;
+               if (columnCount > 0) {
+                   const weights = Array(columnCount).fill('1fr').join(' ');
+                   columns.style.setProperty('--col-weights', weights);
+               }
+           }
+       });
+   }
+
+   getSlideCount() {
+       return this.slides.length;
+   }
+
+   getSlide(index) {
+       return this.slides[index] || null;
+   }
 }
 
 export default MarkdownSlidesParser;
