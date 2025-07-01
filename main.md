@@ -143,6 +143,23 @@ $.
   }
 </script>
 
+## VSCode Highlight
+
+Recommended with \url[vscode highlight extension]{https://marketplace.visualstudio.com/items?itemName=fabiospampinato.vscode-highlight} with settings
+
+```json
+{
+  "highlight.regexes": {
+    "(\\\\(today|(begin|end)row|(|end)(column|compare)(s?)|(sub|subsub|center)title|figure|qrcode|quote|strong|emph|url))": {
+      "filterLanguageRegex": "markdown",
+      "decorations": [
+        { "color": "#aaaaff" }
+      ]
+    }
+  }
+}
+```
+
 ## 
 
 \centertitle{Thank you!}

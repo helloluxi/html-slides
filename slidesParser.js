@@ -62,9 +62,10 @@ export class MarkdownSlidesParser {
 
     postprocessText(text) {
         return text
-            // Handle \url{...}
-            .replace(/\\url\{([^}]*)\}/g, (match, url) => {
-                return `<a href="${url}" target="_blank">${url}</a>`;
+            // Handle \url[display text]{url} and \url{url}
+            .replace(/\\url(?:\[([^\]]*)\])?\{([^}]*)\}/g, (match, displayText, url) => {
+                const text = displayText || url;
+                return `<a href="${url}" target="_blank">${text}</a>`;
             })
             // Handle \strong{...}
             .replace(/\\strong\{([^}]*)\}/g, (match, content) => {
@@ -282,7 +283,7 @@ export class MarkdownSlidesParser {
             if (line.startsWith('```')) {
                 renderCachedLines();
                 if (codeBlockOpen) {
-                    this.currentContent += `<button class="copy-button">Copy</button></code></pre>`;
+                    this.currentContent += `</code><button class="copy-button">Copy</button></pre>`;
                     codeBlockOpen = false;
                     codeLanguage = '';
                 } else {
