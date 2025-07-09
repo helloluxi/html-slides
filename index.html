@@ -371,9 +371,9 @@
                       await fetch('http://localhost:4999', {
                           method: 'POST',
                           headers: {
-                              'Content-Type': 'text/plain',
+                              'Content-Type': 'application/json'
                           },
-                          body: lineNumber
+                          body: JSON.stringify({ file: 'main.md', line: lineNumber })
                       });
                   } catch (error) {
                       console.error('Failed to post line number to localhost:4999:', error);
