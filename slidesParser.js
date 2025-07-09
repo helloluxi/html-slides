@@ -1,6 +1,7 @@
 export class MarkdownSlidesParser {
     constructor() {
         this.slides = [];
+        this.citeTexts = [];
         this.currentSlide = null;
         this.currentContent = '';
         this.citeIdx = 0;
@@ -10,6 +11,7 @@ export class MarkdownSlidesParser {
     parseMarkdown(text) {
         // Reset state
         this.slides = [];
+        this.citeTexts = [];
         this.currentSlide = null;
         this.currentContent = '';
         this.citeIdx = 0;
@@ -74,7 +76,13 @@ export class MarkdownSlidesParser {
             // Handle \emph{...}
             .replace(/\\emph\{([^}]*)\}/g, (match, content) => {
                 return `<em>${content}</em>`;
-            });
+            })
+            // Handle \cite[url]{footnote text}
+            .replace(/\\cite(?:\[(.*?)\])?\{([^}]*)\}/g, (match, url, footnoteText) => {
+                this.citeIdx++;
+                this.citeTexts.push(footnoteText);
+                return `<span class="footnote-cite" data-idx="${this.citeIdx}" data-url="${url}">[${this.citeIdx}]</span>`;
+            })
     }
 
     processParagraph(para) {
@@ -178,13 +186,14 @@ export class MarkdownSlidesParser {
                 closeList();
                 this.currentContent += `<p id="current-date" style="font-size: 2rem;" line="${lineNumber}"></p>`;
                 continue;
-            } else if (trimmedLine.startsWith('\\figure[')) {
+            } else if (trimmedLine.startsWith('\\figure')) {
                 renderCachedLines();
                 closeList();
-                const match = trimmedLine.match(/\\figure\[([^\]]*)\]\{([^}]*)\}\{([^}]*)\}/);
+                const match = trimmedLine.match(/\\figure(?:\[([^\]]*)\])?\{([^}]*)\}\{([^}]*)\}/); // Syntax: \figure[ratio]{src}{caption} or \figure{src}{caption}
                 if (match) {
                     const [, ratio, src, caption] = match;
-                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratio * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
+                    const ratioAttr = ratio || '1.0'; // Default to 1.0 if no ratio specified
+                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratioAttr*100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
                 }
                 continue;
             } else if (trimmedLine.startsWith('\\qrcode{')) {
@@ -202,36 +211,34 @@ export class MarkdownSlidesParser {
                     }
                 }
                 continue;
-            } else if (trimmedLine.startsWith('\\compares*')) {
+            } else if (trimmedLine.startsWith('\\refhtml{')) {
                 renderCachedLines();
                 closeList();
-                this.currentContent += `<div class="compare-table" line="${lineNumber}"><div class="compare-item highlight">`;
-                continue;
-            } else if (trimmedLine.startsWith('\\compares')) {
-                renderCachedLines();
-                closeList();
-                this.currentContent += `<div class="compare-table" line="${lineNumber}"><div class="compare-item">`;
-                continue;
-            } else if (trimmedLine.startsWith('\\compare*')) {
-                renderCachedLines();
-                closeList();
-                this.currentContent += `</div><div class="compare-item highlight" line="${lineNumber}">`;
-                continue;
-            } else if (trimmedLine.startsWith('\\compare')) {
-                renderCachedLines();
-                closeList();
-                this.currentContent += `</div><div class="compare-item" line="${lineNumber}">`;
-                continue;
-            } else if (trimmedLine.match(/^\\columns(?:\[([^\]]*)\])?/)) {
-                renderCachedLines();
-                closeList();
-                const match = trimmedLine.match(/^\\columns(?:\[([^\]]*)\])?/);
-                const weights = match[1];
-                if (weights) {
-                    this.currentContent += `<div class="columns" data-weights="${weights}" line="${lineNumber}"><div class="column">`;
-                } else {
-                    this.currentContent += `<div class="columns" line="${lineNumber}"><div class="column">`;
+                const match = trimmedLine.match(/\\refhtml\{([^}]*)\}/);
+                if (match) {
+                    const refId = match[1];
+                    // Create a placeholder div that will be replaced with the actual HTML content
+                    this.currentContent += `<div class="html-ref" data-ref-id="${refId}" line="${lineNumber}"></div>`;
                 }
+                continue;
+            } else if (trimmedLine.match(/^\\columns\*?(?:\[([^\]]*)\])?/)) {
+                renderCachedLines();
+                closeList();
+                const match = trimmedLine.match(/^\\columns(\*?)(?:\[([^\]]*)\])?/);
+                const isHighlighted = match[1] === '*';
+                const weights = match[2];
+                const firstColumnClass = isHighlighted ? 'column highlight' : 'column';
+                
+                if (weights) {
+                    this.currentContent += `<div class="columns" data-weights="${weights}" line="${lineNumber}"><div class="${firstColumnClass}">`;
+                } else {
+                    this.currentContent += `<div class="columns" line="${lineNumber}"><div class="${firstColumnClass}">`;
+                }
+                continue;
+            } else if (trimmedLine.startsWith('\\column*')) {
+                renderCachedLines();
+                closeList();
+                this.currentContent += `</div><div class="column highlight" line="${lineNumber}">`;
                 continue;
             } else if (trimmedLine.startsWith('\\column')) {
                 renderCachedLines();
@@ -248,31 +255,35 @@ export class MarkdownSlidesParser {
                 closeList();
                 this.currentContent += `</div>`;
                 continue;
-            } else if (trimmedLine.startsWith('\\end')) {
+            } else if (trimmedLine.startsWith('\\endcolumn')) {
                 renderCachedLines();
                 closeList();
                 this.currentContent += `</div></div>`;
                 continue;
             }
 
-            // Handle lists
-            if (trimmedLine.startsWith('+ ') || trimmedLine.startsWith('- ')) {
+            // Handle lists - count consecutive '-' or '+' characters for list level
+            const listMatch = trimmedLine.match(/^([-+]+)\s+(.*)$/);
+            if (listMatch) {
                 renderCachedLines();
-                let thisListLevel = Math.floor((line.match(/^ */)[0].length) / 4);
-                
+                const [, listMarkers, listContent] = listMatch;
+                const thisListLevel = listMarkers.length - 1; // 0-indexed level (- = level 0, -- = level 1, etc.)
+
                 if (thisListLevel < lastListLevel) {
+                    // Close nested lists
                     for (let i = 0; i < lastListLevel - thisListLevel; i++) {
                         this.currentContent += `</ul>`;
                     }
                 }
                 
                 if (thisListLevel > lastListLevel) {
+                    // Open new nested lists
                     for (let i = 0; i < thisListLevel - lastListLevel; i++) {
                         this.currentContent += `<ul class="itemize" line="${lineNumber}">`;
                     }
                 }
                 
-                this.currentContent += `<li line="${lineNumber}">${this.postprocessText(trimmedLine.substring(2))}</li>`;
+                this.currentContent += `<li line="${lineNumber}">${this.postprocessText(listContent)}</li>`;
                 lastListLevel = thisListLevel;
                 continue;
             }
@@ -361,7 +372,7 @@ export class MarkdownSlidesParser {
         }
     }
 
-    renderToContainer(container, isLocalhost = false) {
+    renderToContainer(container) {
         container.innerHTML = '';
         
         this.slides.forEach(slide => {
@@ -461,13 +472,25 @@ export class MarkdownSlidesParser {
 
            const footnoteParagraph = footnoteContainer.querySelector('p');
            footnoteCites.forEach((cite, index) => {
-               this.citeIdx++;
-               const footnoteText = `[${this.citeIdx}] ${cite.textContent.trim()}`;
-               cite.textContent = `[${this.citeIdx}]`;
+               const citeIdx = parseInt(cite.getAttribute('data-idx'));
+               const footnoteText = this.citeTexts[citeIdx - 1]; // Array is 0-indexed
+               const url = cite.getAttribute('data-url');
+               
                if (index > 0) {
                    footnoteParagraph.appendChild(document.createTextNode(' '));
                }
-               footnoteParagraph.appendChild(document.createTextNode(footnoteText));
+               
+               // Create the footnote entry with only citation number as link if URL exists
+               if (url && url !== 'undefined') {
+                   const link = document.createElement('a');
+                   link.href = url;
+                   link.target = '_blank';
+                   link.textContent = `[${citeIdx}]`;
+                   footnoteParagraph.appendChild(link);
+                   footnoteParagraph.appendChild(document.createTextNode(` ${footnoteText}`));
+               } else {
+                   footnoteParagraph.appendChild(document.createTextNode(`[${citeIdx}] ${footnoteText}`));
+               }
            });
        }
    }

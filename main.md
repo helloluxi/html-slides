@@ -10,7 +10,7 @@
 
 ### Instructions
 - Use the arrow keys or mouse scroll to navigate through the slides.
-  - Use double finger swipe on mobile.
+-- Use double finger swipe on mobile.
 - Use the ` key to zoom in.
 - Use url parameter `?p=` to start from a specific slide.
 
@@ -40,9 +40,9 @@
 
 ## Equations
 
-\columns[1fr 1.5fr]
+\columns
 
-<p> Point 1 <a href="https://github.com/helloluxi/html-slides" class="footnote-cite">Github repo.</a> </p>
+Point 1 \cite[https://helloluxi.github.io/html-slides]{Github repo.}
 
 $$
 \ket{\psi} = \alpha\ket{0} + \beta\ket{1}
@@ -56,7 +56,7 @@ $$
 
 \column
 
-<p> Point 2 <a href="https://helloluxi.github.io/html-slides" class="footnote-cite">Github page.</a> </p>
+Point 2 \cite[https://helloluxi.github.io/html-slides]{Github page.}
 
 $$
 [\q, \p] = i
@@ -77,22 +77,22 @@ $.
 
 ## Comparisons
 
-\compares
+\columns
 ### Powerpoint
 - Mouse marathons
 - Nightmare of typing equations
 - Crashes precisely before you save
-\compare*
+\column*
 ### HTML
 - Present anywhere with a browser, even on ad boards
 - Interactive animations make people forget we have skipped proofs
 - AI has seen more html than anything else...
-\compare
+\column
 ### Latex Beamer
 - Compiling &#x27F3;
 - Error: unexpected &#125; in line 342
 - Let me spend 6 hours moving this image 2 pixels left
-\endcompares
+\endcolumn
 
 ## Tables
 
@@ -150,7 +150,7 @@ Recommended with \url[vscode highlight extension]{https://marketplace.visualstud
 ```json
 {
   "highlight.regexes": {
-    "(\\\\(today|(begin|end)row|(|end)(column|compare)(s?)|(sub|subsub|center)title|figure|qrcode|quote|strong|emph|url))": {
+      "(\\\\(today|(begin|end)row|(|end)column(s?)|(sub|subsub|center)title|figure|qrcode|quote|strong|emph|url|cite|refhtml|resetnumber))": {
       "filterLanguageRegex": "markdown",
       "decorations": [
         { "color": "#aaaaff" }

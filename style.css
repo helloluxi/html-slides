@@ -55,6 +55,19 @@ body {
     -ms-user-select: none;
 }
 
+/* Demo-specific body styles when not in slide mode */
+body.demo-mode {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    background-color: #f8f9fa;
+    color: #343a40;
+    overflow: visible;
+    user-select: auto;
+    -webkit-user-select: auto;
+    -moz-user-select: auto;
+    -ms-user-select: auto;
+}
+
 .slides-container {
     width: 100vw;
     height: 100vh;
@@ -134,47 +147,86 @@ h3 {
     margin: 0;
 }
 
-.itemize {
-    margin: 0;
-    padding: 0;
+/* Base list styles */
+ul.itemize {
+    list-style-type: none;
+    margin: 1rem 0;
+    padding-left: 0;
 }
 
-.itemize li {
+/* Level 0 (base level) list items */
+ul.itemize li {
     font-size: 1.8rem;
     margin-bottom: 1.2rem;
-    padding-left: 2rem;
+    padding-left: 2.5rem;
     position: relative;
+    line-height: 1.4;
 }
 
-.itemize li:before {
+ul.itemize li:before {
+    content: "•";
     color: var(--primary-blue);
     font-weight: bold;
     font-size: 2rem;
-    margin-right: 0.8rem;
     position: absolute;
     left: 0;
     top: 0;
     line-height: 1;
 }
 
-.itemize li ul li {
-    margin-top: 0.6rem;
+/* Level 1 (first nested level) - double indent */
+ul.itemize ul.itemize {
+    margin: 0.5rem 0 0.5rem 4rem;
+    padding-left: 0;
 }
 
-ul {
+ul.itemize ul.itemize li {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+    padding-left: 2.5rem;
+}
+
+ul.itemize ul.itemize li:before {
+    content: "•";
+    font-size: 2rem;
+    color: var(--primary-blue);
+    font-weight: bold;
+}
+
+/* Level 2 (second nested level) - quadruple indent */
+ul.itemize ul.itemize ul.itemize {
+    margin: 0.5rem 0 0.5rem 4rem;
+    padding-left: 0;
+}
+
+ul.itemize ul.itemize ul.itemize li {
+    font-size: 1.8rem;
+    margin-bottom: 1.2rem;
+    padding-left: 2.5rem;
+}
+
+ul.itemize ul.itemize ul.itemize li:before {
+    content: "•";
+    font-size: 2rem;
+    color: var(--primary-blue);
+    font-weight: bold;
+}
+
+/* Legacy ul styles for backward compatibility */
+ul:not(.itemize) {
     list-style-type: none;
     padding-left: 0;
     margin: 0;
 }
 
-ul li {
+ul:not(.itemize) li {
     font-size: 1.8rem;
     margin-bottom: 1.2rem;
     padding-left: 2rem;
     position: relative;
 }
 
-ul li:before {
+ul:not(.itemize) li:before {
     content: "•";
     color: var(--primary-blue);
     font-weight: bold;
@@ -202,7 +254,7 @@ label {
 p {
     font-size: 2rem;
     line-height: 1.6;
-    margin-bottom: 1.5rem;
+    margin: 1rem;
 }
 
 .slide-number {
@@ -351,13 +403,36 @@ pre:hover .copy-button {
 }
 
 .footnote {
-    font-size: 1.2rem;
+    font-size: 1.2rem !important;
     margin-top: 1.5rem;
     position: absolute;
     bottom: 20px;
     left: 0;
     right: 0;
-    padding: 0 2rem;
+    padding: 1rem 2rem 0 2rem;
+}
+
+.footnote p {
+    font-size: 1.5rem !important;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.footnote::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 2rem;
+    right: 2rem;
+    height: 1px;
+    background-color: #333;
+}
+
+.footnote a {
+    color: var(--primary-blue);
+    text-decoration: none;
+    vertical-align: baseline;
+    font-size: inherit;
 }
 
 .footnote-ref {
@@ -454,6 +529,11 @@ pre:hover .copy-button {
     box-shadow: 0 4px 6px var(--shadow-light);
 }
 
+.column.highlight {
+    background-color: var(--bg-highlight);
+    border: 2px solid var(--primary-blue);
+}
+
 .column h3 {
     color: var(--primary-blue);
     margin-bottom: 1.5rem;
@@ -478,10 +558,10 @@ pre:hover .copy-button {
     transition: width 0.3s ease;
 }
 
-.equation {
+.katex {
     text-align: center;
-    font-size: 2.2rem;
-    margin-bottom: 1.5rem;
+    font-size: 1.8rem;
+    margin: 0;
 }
 
 .quote-container {
@@ -641,6 +721,319 @@ body::before {
     margin: 10px 0;
 }
 
-a {
-    text-decoration: none;
+/* ============================================================================
+   DEMO-SPECIFIC STYLES (from dvsim_demo.css)
+   ============================================================================ */
+
+/* Demo container styles */
+.container {
+    max-width: 1600px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.demo-mode h1 {
+    text-align: center;
+    color: #495057;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+.plots-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.plot {
+    width: 500px;
+    height: 250px;
+    min-width: 500px;
+    min-height: 250px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #ffffff;
+}
+
+.plot.rotation-canvas {
+    height: 50vh !important;
+    width: calc(50vh * 4/3) !important;
+    max-width: 90vw;
+    min-width: 400px;
+    min-height: 300px;
+}
+
+.plot-title {
+    text-align: center;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: #495057;
+    font-size: 1.5em;
+}
+
+/* Controls styles */
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.slider-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.slider-label {
+    min-width: 80px;
+    font-weight: 500;
+    color: #495057;
+}
+
+/* Demo slider styles (override slide slider styles) */
+.demo-mode .slider,
+.controls .slider {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    background: #dee2e6;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    width: auto;
+}
+
+.demo-mode .slider::-webkit-slider-thumb,
+.controls .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.demo-mode .slider::-moz-range-thumb,
+.controls .slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #007bff;
+    cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Disabled slider styles */
+.demo-mode .slider:disabled,
+.controls .slider:disabled {
+    background: #e9ecef;
+    cursor: not-allowed;
+}
+
+.demo-mode .slider:disabled::-webkit-slider-thumb,
+.controls .slider:disabled::-webkit-slider-thumb {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+.demo-mode .slider:disabled::-moz-range-thumb,
+.controls .slider:disabled::-moz-range-thumb {
+    background: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Demo slider container with tick marks */
+.demo-mode .slider-container,
+.controls .slider-container {
+    position: relative;
+    flex: 1;
+    min-width: 400px;
+    display: block;
+}
+
+.slider-ticks {
+    position: absolute;
+    top: 8px;
+    left: 95px; /* Position after label */
+    right: 75px; /* Position before value */
+    height: 2px;
+    pointer-events: none;
+}
+
+.tick-mark {
+    position: absolute;
+    width: 3px;
+    height: 14px;
+    background: #007bff;
+    top: -6px;
+    border-radius: 1px;
+}
+
+.tick-mark.start { left: 0%; }
+.tick-mark.third { left: 33.33%; }
+.tick-mark.two-third { left: 66.67%; }
+.tick-mark.end { left: 100%; transform: translateX(-100%); }
+
+.demo-mode .slider-value,
+.controls .slider-value {
+    min-width: 60px;
+    text-align: right;
+    font-weight: 500;
+    color: #495057;
+    font-size: inherit;
+}
+
+/* Tabs styles */
+.tabs-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.tabs-label {
+    min-width: 100px;
+    font-weight: 500;
+    color: #495057;
+}
+
+.tabs {
+    display: flex;
+    gap: 5px;
+    flex: 1;
+    justify-content: center;
+}
+
+.tab {
+    padding: 8px 16px;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    background: white;
+    color: #495057;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    min-width: 40px;
+    text-align: center;
+}
+
+.tab:hover {
+    background: #f8f9fa;
+    border-color: #007bff;
+}
+
+.tab.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* Panel styles */
+.panel {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.panel h2 {
+    text-align: center;
+    color: #495057;
+    margin-bottom: 15px;
+    font-weight: 400;
+    font-size: 2.2em;
+    line-height: 1.4;
+}
+
+.panel h2 .katex {
+    font-size: 1em;
+}
+
+/* SVG axis styles */
+.axis {
+    stroke: #6c757d;
+    stroke-width: 1;
+}
+
+.axis text {
+    fill: #6c757d;
+    font-size: 12px;
+}
+
+.grid-line {
+    stroke: #e9ecef;
+    stroke-width: 0.5;
+    stroke-dasharray: 2,2;
+}
+
+/* Instance container styles */
+.instance-container {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 12px;
+    background: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
+}
+
+/* Control row for buttons */
+.control-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+/* Play/Pause button styles */
+.play-pause-btn {
+    background: white;
+    color: #007bff;
+    border: 2px solid #007bff;
+    padding: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.play-pause-btn:hover {
+    background: #f8f9fa;
+    border-color: #0056b3;
+    color: #0056b3;
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}
+
+.play-pause-btn:active {
+    transform: scale(0.95);
+}
+
+.play-pause-btn:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+.pause-icon, .play-icon {
+    display: block;
+    line-height: 1;
 }
