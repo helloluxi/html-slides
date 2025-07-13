@@ -55,19 +55,6 @@ body {
     -ms-user-select: none;
 }
 
-/* Demo-specific body styles when not in slide mode */
-body.demo-mode {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    padding: 20px;
-    background-color: #f8f9fa;
-    color: #343a40;
-    overflow: visible;
-    user-select: auto;
-    -webkit-user-select: auto;
-    -moz-user-select: auto;
-    -ms-user-select: auto;
-}
-
 .slides-container {
     width: 100vw;
     height: 100vh;
@@ -721,11 +708,6 @@ body::before {
     margin: 10px 0;
 }
 
-/* ============================================================================
-   DEMO-SPECIFIC STYLES (from dvsim_demo.css)
-   ============================================================================ */
-
-/* Demo container styles */
 .container {
     max-width: 1600px;
     margin: 0 auto;
@@ -733,13 +715,6 @@ body::before {
     padding: 30px;
     border-radius: 12px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.demo-mode h1 {
-    text-align: center;
-    color: #495057;
-    margin-bottom: 30px;
-    font-weight: 300;
 }
 
 .plots-container {
@@ -801,8 +776,6 @@ body::before {
     color: #495057;
 }
 
-/* Demo slider styles (override slide slider styles) */
-.demo-mode .slider,
 .controls .slider {
     flex: 1;
     height: 6px;
@@ -814,7 +787,6 @@ body::before {
     width: auto;
 }
 
-.demo-mode .slider::-webkit-slider-thumb,
 .controls .slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
@@ -827,7 +799,6 @@ body::before {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.demo-mode .slider::-moz-range-thumb,
 .controls .slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
@@ -838,27 +809,21 @@ body::before {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-/* Disabled slider styles */
-.demo-mode .slider:disabled,
 .controls .slider:disabled {
     background: #e9ecef;
     cursor: not-allowed;
 }
 
-.demo-mode .slider:disabled::-webkit-slider-thumb,
 .controls .slider:disabled::-webkit-slider-thumb {
     background: #6c757d;
     cursor: not-allowed;
 }
 
-.demo-mode .slider:disabled::-moz-range-thumb,
 .controls .slider:disabled::-moz-range-thumb {
     background: #6c757d;
     cursor: not-allowed;
 }
 
-/* Demo slider container with tick marks */
-.demo-mode .slider-container,
 .controls .slider-container {
     position: relative;
     flex: 1;
@@ -869,8 +834,8 @@ body::before {
 .slider-ticks {
     position: absolute;
     top: 8px;
-    left: 95px; /* Position after label */
-    right: 75px; /* Position before value */
+    left: 95px;
+    right: 75px;
     height: 2px;
     pointer-events: none;
 }
@@ -889,7 +854,6 @@ body::before {
 .tick-mark.two-third { left: 66.67%; }
 .tick-mark.end { left: 100%; transform: translateX(-100%); }
 
-.demo-mode .slider-value,
 .controls .slider-value {
     min-width: 60px;
     text-align: right;
@@ -898,7 +862,6 @@ body::before {
     font-size: inherit;
 }
 
-/* Tabs styles */
 .tabs-container {
     display: flex;
     align-items: center;
@@ -942,7 +905,6 @@ body::before {
     border-color: #007bff;
 }
 
-/* Panel styles */
 .panel {
     margin-bottom: 20px;
     padding: 15px;
@@ -964,7 +926,6 @@ body::before {
     font-size: 1em;
 }
 
-/* SVG axis styles */
 .axis {
     stroke: #6c757d;
     stroke-width: 1;
@@ -981,7 +942,6 @@ body::before {
     stroke-dasharray: 2,2;
 }
 
-/* Instance container styles */
 .instance-container {
     margin-bottom: 15px;
     padding: 10px;
@@ -990,14 +950,12 @@ body::before {
     box-shadow: 0 2px 4px rgba(0, 123, 255, 0.1);
 }
 
-/* Control row for buttons */
 .control-row {
     display: flex;
     justify-content: center;
     margin-bottom: 10px;
 }
 
-/* Play/Pause button styles */
 .play-pause-btn {
     background: white;
     color: #007bff;

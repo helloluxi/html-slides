@@ -117,7 +117,11 @@
 
           clearTimeout(wheelTimeout);
           wheelTimeout = setTimeout(() => {
-            const steps = Math.floor(Math.abs(accumulatedDelta) / 100);
+            // Adjust threshold based on zoom level to maintain consistent behavior
+            const zoomLevel = window.devicePixelRatio || 1;
+            const adjustedThreshold = 100 / zoomLevel;
+            
+            const steps = Math.floor(Math.abs(accumulatedDelta) / adjustedThreshold);
             const direction = accumulatedDelta > 0 ? 1 : -1;
 
             for (let i = 0; i < steps; i++) {
