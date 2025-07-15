@@ -10,7 +10,7 @@
 
 ### Instructions
 - Use the arrow keys or mouse scroll to navigate through the slides.
--- Use double finger swipe on mobile.
+  - Use double finger swipe on mobile.
 - Use the ` key to zoom in.
 - Use url parameter `?p=` to start from a specific slide.
 

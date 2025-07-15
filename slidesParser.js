@@ -16,13 +16,13 @@ export class MarkdownSlidesParser {
         this.currentContent = '';
         this.citeIdx = 0;
         this.startLineNumber = 1;
-        
+
         // Split paragraphs while tracking line numbers
         const lines = text.split(/\r?\n/);
         const paras = [];
         let currentPara = [];
         let paraStartLine = 1;
-        
+
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             if (line.trim() === '') {
@@ -45,7 +45,7 @@ export class MarkdownSlidesParser {
                 currentPara.push(line);
             }
         }
-        
+
         // Add final paragraph if exists
         if (currentPara.length > 0) {
             paras.push({
@@ -53,7 +53,7 @@ export class MarkdownSlidesParser {
                 startLine: paraStartLine
             });
         }
-        
+
         for (let para of paras) {
             this.startLineNumber = para.startLine;
             this.processParagraph(para.content);
@@ -100,7 +100,7 @@ export class MarkdownSlidesParser {
                 lastListLevel = -1;
             }
         };
-        
+
         const renderCachedLines = () => {
             const joinedLines = cachedLines.join(' ').trim();
             if (joinedLines.startsWith('<') && joinedLines.endsWith('>')) {
@@ -113,13 +113,13 @@ export class MarkdownSlidesParser {
             }
             cachedLines = [];
         };
-        
+
         const lines = para.split(/\r?\n/);
         for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
             let trimmedLine = line.trim();
             const lineNumber = currentLineNumber + i;
-            
+
             // Handle headings (slide creation)
             if (line.startsWith('# ')) {
                 renderCachedLines();
@@ -143,7 +143,7 @@ export class MarkdownSlidesParser {
                 closeList();
                 this.currentContent += `<h4 line="${lineNumber}">${line.substring(5).trim()}</h4>`;
                 continue;
-            } 
+            }
             // Move preprocessText functions here with line.startsWith checks
             else if (trimmedLine.startsWith('\\quote{')) {
                 renderCachedLines();
@@ -193,7 +193,7 @@ export class MarkdownSlidesParser {
                 if (match) {
                     const [, ratio, src, caption] = match;
                     const ratioAttr = ratio || '1.0'; // Default to 1.0 if no ratio specified
-                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratioAttr*100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
+                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratioAttr * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
                 }
                 continue;
             } else if (trimmedLine.startsWith('\\qrcode{')) {
@@ -228,7 +228,7 @@ export class MarkdownSlidesParser {
                 const isHighlighted = match[1] === '*';
                 const weights = match[2];
                 const firstColumnClass = isHighlighted ? 'column highlight' : 'column';
-                
+
                 if (weights) {
                     this.currentContent += `<div class="columns" data-weights="${weights}" line="${lineNumber}"><div class="${firstColumnClass}">`;
                 } else {
@@ -262,12 +262,11 @@ export class MarkdownSlidesParser {
                 continue;
             }
 
-            // Handle lists - count consecutive '-' or '+' characters for list level
-            const listMatch = trimmedLine.match(/^([-+]+)\s+(.*)$/);
-            if (listMatch) {
+            // Handle lists
+            if (trimmedLine.startsWith('+ ') || trimmedLine.startsWith('- ')) {
+                const [, spaceMatch, listContent] = line.match(/^(\s*)[+-]\s+(.*)/);
                 renderCachedLines();
-                const [, listMarkers, listContent] = listMatch;
-                const thisListLevel = listMarkers.length - 1; // 0-indexed level (- = level 0, -- = level 1, etc.)
+                const thisListLevel = spaceMatch.length >> 1;
 
                 if (thisListLevel < lastListLevel) {
                     // Close nested lists
@@ -275,21 +274,21 @@ export class MarkdownSlidesParser {
                         this.currentContent += `</ul>`;
                     }
                 }
-                
+
                 if (thisListLevel > lastListLevel) {
                     // Open new nested lists
                     for (let i = 0; i < thisListLevel - lastListLevel; i++) {
                         this.currentContent += `<ul class="itemize" line="${lineNumber}">`;
                     }
                 }
-                
+
                 this.currentContent += `<li line="${lineNumber}">${this.postprocessText(listContent)}</li>`;
                 lastListLevel = thisListLevel;
                 continue;
             }
-            
+
             closeList();
-            
+
             // Handle code blocks
             if (line.startsWith('```')) {
                 renderCachedLines();
@@ -308,13 +307,13 @@ export class MarkdownSlidesParser {
                 }
                 continue;
             }
-            
+
             // Handle code block content
             if (codeBlockOpen) {
                 this.currentContent += this.escapeHtml(line) + '\n';
                 continue;
             }
-            
+
             // Cache regular lines
             if (trimmedLine.length > 0) {
                 if (cachedLines.length === 0) {
@@ -323,7 +322,7 @@ export class MarkdownSlidesParser {
                 cachedLines.push(line);
             }
         }
-        
+
         closeList();
         renderCachedLines();
     }
@@ -341,7 +340,7 @@ export class MarkdownSlidesParser {
         if (typeof document !== 'undefined') {
             document.title = title.trim();
         }
-        
+
         this.currentSlide = {
             type: 'title',
             className: 'slide title-slide',
@@ -374,14 +373,14 @@ export class MarkdownSlidesParser {
 
     renderToContainer(container) {
         container.innerHTML = '';
-        
+
         this.slides.forEach(slide => {
             const slideElement = document.createElement('div');
             slideElement.className = slide.className;
             if (slide.lineNumber) {
                 slideElement.setAttribute('line', slide.lineNumber);
             }
-            
+
             if (slide.type === 'title') {
                 slideElement.innerHTML = `
                     <div class="slide-content">
@@ -398,152 +397,152 @@ export class MarkdownSlidesParser {
                     </div>
                 `;
             }
-            
+
             container.appendChild(slideElement);
         });
-        
+
         // Process special elements after rendering
         this.processAllSlideSpecialElements(container);
-        
+
         return container.querySelectorAll('.slide');
     }
 
-   initializeQRCodes(container) {
-       if (typeof QRCode === 'undefined') {
-           console.warn('QRCode library not loaded');
-           return;
-       }
+    initializeQRCodes(container) {
+        if (typeof QRCode === 'undefined') {
+            console.warn('QRCode library not loaded');
+            return;
+        }
 
-       container.querySelectorAll('.qr-container').forEach(qrContainer => {
-           const message = qrContainer.getAttribute('data-message');
-           if (message && !qrContainer.querySelector('canvas, img')) {
-               try {
-                   new QRCode(qrContainer, {
-                       text: message.trim(),
-                       width: 300,
-                       height: 300,
-                       colorDark: '#000000',
-                       colorLight: '#ffffff',
-                       correctLevel: QRCode.CorrectLevel.H
-                   });
-               } catch (error) {
-                   console.error('Error generating QR code:', error);
-                   qrContainer.innerHTML = '<div class="qr-error">Error generating QR code</div>';
-               }
-           }
-       });
-   }
+        container.querySelectorAll('.qr-container').forEach(qrContainer => {
+            const message = qrContainer.getAttribute('data-message');
+            if (message && !qrContainer.querySelector('canvas, img')) {
+                try {
+                    new QRCode(qrContainer, {
+                        text: message.trim(),
+                        width: 300,
+                        height: 300,
+                        colorDark: '#000000',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.H
+                    });
+                } catch (error) {
+                    console.error('Error generating QR code:', error);
+                    qrContainer.innerHTML = '<div class="qr-error">Error generating QR code</div>';
+                }
+            }
+        });
+    }
 
-   processAllSlideSpecialElements(container) {
-       // Process equations
-       container.querySelectorAll('.equation').forEach(equation => {
-           const content = equation.textContent.trim();
-           if (!content.startsWith('$') && !content.endsWith('$')) {
-               equation.textContent = `$${content}$`;
-           }
-       });
+    processAllSlideSpecialElements(container) {
+        // Process equations
+        container.querySelectorAll('.equation').forEach(equation => {
+            const content = equation.textContent.trim();
+            if (!content.startsWith('$') && !content.endsWith('$')) {
+                equation.textContent = `$${content}$`;
+            }
+        });
 
-       // Process footnotes for each slide
-       container.querySelectorAll('.slide').forEach(slide => {
-           this.processSlideFootnotes(slide);
-       });
+        // Process footnotes for each slide
+        container.querySelectorAll('.slide').forEach(slide => {
+            this.processSlideFootnotes(slide);
+        });
 
-       // Setup copy buttons
-       this.setupCopyButtons(container);
+        // Setup copy buttons
+        this.setupCopyButtons(container);
 
-       // Initialize QR codes
-       this.initializeQRCodes(container);
+        // Initialize QR codes
+        this.initializeQRCodes(container);
 
-       // Setup columns
-       this.setupColumns(container);
-   }
+        // Setup columns
+        this.setupColumns(container);
+    }
 
-   processSlideFootnotes(slide) {
-       const footnoteCites = slide.querySelectorAll('.footnote-cite');
-       if (footnoteCites.length > 0) {
-           let footnoteContainer = slide.querySelector('.footnote');
-           if (!footnoteContainer) {
-               footnoteContainer = document.createElement('div');
-               footnoteContainer.className = 'footnote';
-               const footnoteParagraph = document.createElement('p');
-               footnoteContainer.appendChild(footnoteParagraph);
-               slide.querySelector('.slide-content').appendChild(footnoteContainer);
-           }
+    processSlideFootnotes(slide) {
+        const footnoteCites = slide.querySelectorAll('.footnote-cite');
+        if (footnoteCites.length > 0) {
+            let footnoteContainer = slide.querySelector('.footnote');
+            if (!footnoteContainer) {
+                footnoteContainer = document.createElement('div');
+                footnoteContainer.className = 'footnote';
+                const footnoteParagraph = document.createElement('p');
+                footnoteContainer.appendChild(footnoteParagraph);
+                slide.querySelector('.slide-content').appendChild(footnoteContainer);
+            }
 
-           const footnoteParagraph = footnoteContainer.querySelector('p');
-           footnoteCites.forEach((cite, index) => {
-               const citeIdx = parseInt(cite.getAttribute('data-idx'));
-               const footnoteText = this.citeTexts[citeIdx - 1]; // Array is 0-indexed
-               const url = cite.getAttribute('data-url');
-               
-               if (index > 0) {
-                   footnoteParagraph.appendChild(document.createTextNode(' '));
-               }
-               
-               // Create the footnote entry with only citation number as link if URL exists
-               if (url && url !== 'undefined') {
-                   const link = document.createElement('a');
-                   link.href = url;
-                   link.target = '_blank';
-                   link.textContent = `[${citeIdx}]`;
-                   footnoteParagraph.appendChild(link);
-                   footnoteParagraph.appendChild(document.createTextNode(` ${footnoteText}`));
-               } else {
-                   footnoteParagraph.appendChild(document.createTextNode(`[${citeIdx}] ${footnoteText}`));
-               }
-           });
-       }
-   }
+            const footnoteParagraph = footnoteContainer.querySelector('p');
+            footnoteCites.forEach((cite, index) => {
+                const citeIdx = parseInt(cite.getAttribute('data-idx'));
+                const footnoteText = this.citeTexts[citeIdx - 1]; // Array is 0-indexed
+                const url = cite.getAttribute('data-url');
 
-   setupCopyButtons(container) {
-       container.querySelectorAll('.copy-button').forEach(button => {
-           button.addEventListener('click', async () => {
-               const codeBlock = button.previousElementSibling;
-               const code = codeBlock.textContent;
-               
-               try {
-                   await navigator.clipboard.writeText(code);
-                   button.textContent = 'Copied!';
-                   button.classList.add('copied');
-                   
-                   setTimeout(() => {
-                       button.textContent = 'Copy';
-                       button.classList.remove('copied');
-                   }, 2000);
-               } catch (err) {
-                   console.error('Failed to copy code:', err);
-                   button.textContent = 'Error!';
-                   
-                   setTimeout(() => {
-                       button.textContent = 'Copy';
-                   }, 2000);
-               }
-           });
-       });
-   }
+                if (index > 0) {
+                    footnoteParagraph.appendChild(document.createTextNode(' '));
+                }
 
-   setupColumns(container) {
-       container.querySelectorAll('.columns').forEach(columns => {
-           if (columns.hasAttribute('data-weights')) {
-               const weights = columns.getAttribute('data-weights').split(' ');
-               columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
-           } else {
-               const columnCount = columns.querySelectorAll('.column').length;
-               if (columnCount > 0) {
-                   const weights = Array(columnCount).fill('1fr').join(' ');
-                   columns.style.setProperty('--col-weights', weights);
-               }
-           }
-       });
-   }
+                // Create the footnote entry with only citation number as link if URL exists
+                if (url && url !== 'undefined') {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.textContent = `[${citeIdx}]`;
+                    footnoteParagraph.appendChild(link);
+                    footnoteParagraph.appendChild(document.createTextNode(` ${footnoteText}`));
+                } else {
+                    footnoteParagraph.appendChild(document.createTextNode(`[${citeIdx}] ${footnoteText}`));
+                }
+            });
+        }
+    }
 
-   getSlideCount() {
-       return this.slides.length;
-   }
+    setupCopyButtons(container) {
+        container.querySelectorAll('.copy-button').forEach(button => {
+            button.addEventListener('click', async () => {
+                const codeBlock = button.previousElementSibling;
+                const code = codeBlock.textContent;
 
-   getSlide(index) {
-       return this.slides[index] || null;
-   }
+                try {
+                    await navigator.clipboard.writeText(code);
+                    button.textContent = 'Copied!';
+                    button.classList.add('copied');
+
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                        button.classList.remove('copied');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Failed to copy code:', err);
+                    button.textContent = 'Error!';
+
+                    setTimeout(() => {
+                        button.textContent = 'Copy';
+                    }, 2000);
+                }
+            });
+        });
+    }
+
+    setupColumns(container) {
+        container.querySelectorAll('.columns').forEach(columns => {
+            if (columns.hasAttribute('data-weights')) {
+                const weights = columns.getAttribute('data-weights').split(' ');
+                columns.style.setProperty('--col-weights', weights.map(w => w).join(' '));
+            } else {
+                const columnCount = columns.querySelectorAll('.column').length;
+                if (columnCount > 0) {
+                    const weights = Array(columnCount).fill('1fr').join(' ');
+                    columns.style.setProperty('--col-weights', weights);
+                }
+            }
+        });
+    }
+
+    getSlideCount() {
+        return this.slides.length;
+    }
+
+    getSlide(index) {
+        return this.slides[index] || null;
+    }
 }
 
 export default MarkdownSlidesParser;
