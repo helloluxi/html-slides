@@ -6,6 +6,7 @@ export class MarkdownSlidesParser {
         this.currentContent = '';
         this.citeIdx = 0;
         this.startLineNumber = 1; // Member variable for line tracking
+        this.graphicPath = '.';
     }
 
     parseMarkdown(text) {
@@ -193,7 +194,7 @@ export class MarkdownSlidesParser {
                 if (match) {
                     const [, ratio, src, caption] = match;
                     const ratioAttr = ratio || '1.0'; // Default to 1.0 if no ratio specified
-                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${src}" alt="${caption}" style="width: ${ratioAttr * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
+                    this.currentContent += `<div class="figure" line="${lineNumber}"><img src="${this.graphicPath}/${src}" alt="${caption}" style="width: ${ratioAttr * 100}%; height: auto;"><div class="figure-caption">${caption}</div></div>`;
                 }
                 continue;
             } else if (trimmedLine.startsWith('\\qrcode{')) {
@@ -259,6 +260,12 @@ export class MarkdownSlidesParser {
                 renderCachedLines();
                 closeList();
                 this.currentContent += `</div></div>`;
+                continue;
+            } else if (trimmedLine.startsWith('\\graphicspath')) {
+                const match = trimmedLine.match(/\\graphicspath\{([^}]*)\}/);
+                if (match) {
+                    this.graphicPath = match[1];
+                }
                 continue;
             }
 

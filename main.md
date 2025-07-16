@@ -150,7 +150,7 @@ Recommended with \url[vscode highlight extension]{https://marketplace.visualstud
 ```json
 {
   "highlight.regexes": {
-      "(\\\\(today|(begin|end)row|(|end)column(s?)|(sub|subsub|center)title|figure|qrcode|quote|strong|emph|url|cite|refhtml|resetnumber))": {
+      "(\\\\(today|(begin|end)row|(|end)column(s?)|(sub|subsub|center)title|figure|qrcode|quote|strong|emph|url|cite|graphicspath|refhtml|resetnumber))": {
       "filterLanguageRegex": "markdown",
       "decorations": [
         { "color": "#aaaaff" }
