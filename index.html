@@ -83,9 +83,9 @@
       setupEventListeners() {
         // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ') {
+          if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'PageDown') {
             this.nextSlide();
-          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp') {
             this.prevSlide();
           }
         });
